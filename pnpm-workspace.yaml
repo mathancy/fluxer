@@ -117,6 +117,7 @@ catalog:
   favico.js: 0.3.10
   framer-motion: 13.4.0
   hi-base32: 0.5.1
+  highlight.js: 11.11.1
   hono: 4.13.8
   html-entities: 2.6.0
   idna-uts46-hx: 6.2.1
@@ -161,6 +162,9 @@ catalog:
   react-dom: 19.3.0
   react-hook-form: 7.88.0
   react-hotkeys-hook: 5.3.3
+  react-modal-sheet: 5.2.1
+  react-select: 5.10.2
+  react-zoom-pan-pinch: 3.7.0
   remark-gfm: 4.0.1
   rxjs: 7.8.2
   send: 1.2.1
@@ -221,7 +225,10 @@ peerDependencyRules:
 
 strictDepBuilds: true
 
-trustPolicy: no-downgrade
+# Relaxed from no-downgrade to allow Excalidraw 0.18.0 (React 19 support).
+# Several packages in its dep tree (mermaid, langium) temporarily lost provenance.
+# Restore to no-downgrade once excalidraw's dep tree has full provenance.
+trustPolicy: audit
 
 trustPolicyExclude:
   - semver

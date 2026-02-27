@@ -8,6 +8,7 @@ import {
 	DefinePlugin,
 	HtmlRspackPlugin,
 	LightningCssMinimizerRspackPlugin,
+	ProvidePlugin,
 	SwcJsMinimizerRspackPlugin,
 } from '@rspack/core';
 import {createPoFileRule, getLinguiSwcPluginConfig} from './scripts/build/rspack/lingui.mjs';
@@ -220,6 +221,14 @@ export default () => {
 					ROOT_DIR,
 					'node_modules/@arborium/arborium/dist/arborium_host_bg.wasm',
 				),
+				// roughjs, pica, and image-blob-reduce are deps of @excalidraw/excalidraw but
+				// pnpm's strict hoisting prevents Rspack from resolving them via the normal
+				// node_modules walk when they are imported via bare-specifier dynamic imports
+				// inside Excalidraw's pre-built dist chunks.
+				roughjs: path.resolve(__dirname, 'node_modules/roughjs'),
+				pica: path.resolve(__dirname, 'node_modules/pica'),
+				'image-blob-reduce': path.resolve(__dirname, 'node_modules/image-blob-reduce'),
+				'~': SRC_DIR,
 				'@app': SRC_DIR,
 				'@fluxer/voice_engine_v2/bridge': path.join(
 					MONOREPO_ROOT,
@@ -434,6 +443,9 @@ export default () => {
 				staticCdnEndpoint: normalizedStaticCdnEndpoint,
 				fontsDir: path.join(MONOREPO_ROOT, 'packages', 'fonts'),
 				wasmCratesDir: path.join(ROOT_DIR, 'rust'),
+			}),
+			new ProvidePlugin({
+				process: ['process/browser'],
 			}),
 			new DefinePlugin({
 				__FLUXER_PRECACHE_MANIFEST__: JSON.stringify([]),
