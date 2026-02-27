@@ -78,6 +78,7 @@ import type {ClientIpResolution} from '@app/api/utils/RequestClientIp';
 import type {SweegoWebhookService} from '@app/api/webhook/SweegoWebhookService';
 import type {WebhookRequestService} from '@app/api/webhook/WebhookRequestService';
 import type {WebhookService} from '@app/api/webhook/WebhookService';
+import type {WhiteboardService} from '@app/api/whiteboard/WhiteboardService';
 import type {WorkerTaskName} from '@app/api/worker/WorkerLaneConfig';
 import type {ICacheService} from '@pkgs/cache/src/ICacheService';
 import type {IEmailService} from '@pkgs/email/src/IEmailService';
@@ -174,6 +175,7 @@ export interface HonoEnv {
 		sweegoWebhookService: SweegoWebhookService;
 		webhookService: WebhookService;
 		webhookRequestService: WebhookRequestService;
+		whiteboardService: WhiteboardService;
 		workerService: IWorkerService<WorkerTaskName>;
 		stripeService: StripeService;
 		ageVerificationService: AgeVerificationService;

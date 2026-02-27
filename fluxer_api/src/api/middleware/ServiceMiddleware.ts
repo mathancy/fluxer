@@ -165,6 +165,7 @@ import {getRequestClientIp} from '@app/api/utils/RequestClientIp';
 import {VoiceService} from '@app/api/voice/VoiceService';
 import {WebhookRequestService} from '@app/api/webhook/WebhookRequestService';
 import {WebhookService} from '@app/api/webhook/WebhookService';
+import {WhiteboardService} from '@app/api/whiteboard/WhiteboardService';
 import {lookupAsnByIp, lookupGeoipByIp} from '@pkgs/geoip/src/GeoipLookup';
 import {createIpInfoService, createUnavailableIpInfoService, type IpInfoService} from '@pkgs/geoip/src/IpInfoService';
 import {createMiddleware} from 'hono/factory';
@@ -401,6 +402,7 @@ class RequestServices implements RequestScopedServices {
 	private cachedUserRelationshipRequestService: UserRelationshipRequestService | undefined;
 	private cachedWebhookService: WebhookService | undefined;
 	private cachedWebhookRequestService: WebhookRequestService | undefined;
+	private cachedWhiteboardService: WhiteboardService | undefined;
 
 	constructor(
 		private readonly context: ApiContext,
@@ -1048,6 +1050,11 @@ class RequestServices implements RequestScopedServices {
 			getSweegoWebhookService(),
 		);
 		return this.cachedWebhookRequestService;
+	}
+
+	get whiteboardService(): WhiteboardService {
+		this.cachedWhiteboardService ??= new WhiteboardService(this.storageService, this.gatewayService);
+		return this.cachedWhiteboardService;
 	}
 }
 

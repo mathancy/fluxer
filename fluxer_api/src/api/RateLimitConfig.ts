@@ -14,6 +14,7 @@ import type {RateLimitSection} from '@app/api/rate_limit_configs/RateLimitHelper
 import {mergeRateLimitSections} from '@app/api/rate_limit_configs/RateLimitHelpers';
 import {UserRateLimitConfigs} from '@app/api/rate_limit_configs/UserRateLimitConfig';
 import {WebhookRateLimitConfigs} from '@app/api/rate_limit_configs/WebhookRateLimitConfig';
+import {WhiteboardRateLimitConfigs} from '@app/api/rate_limit_configs/WhiteboardRateLimitConfig';
 
 const rateLimitSections = [
 	AuthRateLimitConfigs,
@@ -28,5 +29,6 @@ const rateLimitSections = [
 	IntegrationRateLimitConfigs,
 	AdminRateLimitConfigs,
 	MiscRateLimitConfigs,
+	WhiteboardRateLimitConfigs,
 ] satisfies ReadonlyArray<RateLimitSection>;
 export const RateLimitConfigs = mergeRateLimitSections(...rateLimitSections);

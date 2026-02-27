@@ -41,6 +41,7 @@ import type {HonoApp} from '@app/api/types/HonoEnv';
 import {UnfurlController} from '@app/api/unfurl/UnfurlController';
 import {UserController} from '@app/api/user/controllers/UserController';
 import {WebhookController} from '@app/api/webhook/WebhookController';
+import {WhiteboardController} from '@app/api/whiteboard/WhiteboardController';
 
 export function registerControllers(routes: HonoApp, config: APIConfig): void {
 	InternalRpcController(routes);
@@ -76,6 +77,7 @@ export function registerControllers(routes: HonoApp, config: APIConfig): void {
 		registerInboundSmsWebhook(routes);
 	}
 	WebhookController(routes);
+	WhiteboardController(routes);
 	OAuth2Controller(routes);
 	OAuth2ApplicationsController(routes);
 	PremiumController(routes);

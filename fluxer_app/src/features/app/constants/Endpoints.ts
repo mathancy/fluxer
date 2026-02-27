@@ -87,6 +87,9 @@ export const Endpoints = {
 	CHANNEL_CALL: (channelId: string) => `/channels/${channelId}/call`,
 	CHANNEL_CALL_RING: (channelId: string) => `/channels/${channelId}/call/ring`,
 	CHANNEL_CALL_STOP_RINGING: (channelId: string) => `/channels/${channelId}/call/stop-ringing`,
+	CHANNEL_WHITEBOARD: (channelId: string) => `/channels/${channelId}/whiteboard`,
+	CHANNEL_WHITEBOARD_CURSOR: (channelId: string) => `/channels/${channelId}/whiteboard/cursor`,
+
 	GUILDS: '/guilds',
 	GUILD: (guildId: string) => `/guilds/${guildId}`,
 	GUILD_CHANNELS: (guildId: string) => `/guilds/${guildId}/channels`,
