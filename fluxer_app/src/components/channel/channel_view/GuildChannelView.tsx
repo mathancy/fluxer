@@ -31,6 +31,7 @@ import styles from '@app/components/channel/ChannelIndexPage.module.css';
 import {ChannelMembers} from '@app/components/channel/ChannelMembers';
 import {ChannelSearchResults} from '@app/components/channel/ChannelSearchResults';
 import {ChannelTextarea} from '@app/components/channel/ChannelTextarea';
+import {WhiteboardApp} from '@app/apps/whiteboard/WhiteboardApp';
 import {ChannelViewScaffold} from '@app/components/channel/channel_view/ChannelViewScaffold';
 import {useChannelSearchState} from '@app/components/channel/channel_view/useChannelSearchState';
 import {Messages} from '@app/components/channel/Messages';
@@ -123,6 +124,11 @@ export const GuildChannelView = observer(({channelId, guildId}: GuildChannelView
 				<NSFWChannelGate channelId={channelId} guildId={guild.id} scope={gateScope} reason={nsfwGateReason} />
 			</div>
 		);
+	}
+
+	const isWhiteboardChannel = channel.type === ChannelTypes.GUILD_WHITEBOARD;
+	if (isWhiteboardChannel) {
+		return <WhiteboardApp key={channelId} channelId={channelId} channelName={channel.name ?? undefined} />;
 	}
 
 	const isVoiceChannel = channel.type === ChannelTypes.GUILD_VOICE;
