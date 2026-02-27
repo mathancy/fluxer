@@ -581,6 +581,8 @@ export const ChannelDetailsBottomSheet: React.FC<ChannelDetailsBottomSheetProps>
 					return t`Text Channel`;
 				case ChannelTypes.GUILD_VOICE:
 					return t`Voice Channel`;
+				case ChannelTypes.GUILD_WHITEBOARD:
+					return t`Whiteboard Channel`;
 				case ChannelTypes.DM:
 					return t`Direct Message`;
 				case ChannelTypes.DM_PERSONAL_NOTES:

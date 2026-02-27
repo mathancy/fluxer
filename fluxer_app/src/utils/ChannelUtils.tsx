@@ -33,6 +33,7 @@ import {
 	type IconProps,
 	LinkIcon,
 	NotePencilIcon,
+	PencilSimpleIcon,
 	SpeakerHighIcon,
 } from '@phosphor-icons/react';
 
@@ -54,6 +55,8 @@ export function getIcon(channel: {type: number; nsfw?: boolean}, props: IconProp
 			return <LinkIcon weight="bold" {...props} />;
 		case ChannelTypes.DM_PERSONAL_NOTES:
 			return <NotePencilIcon weight="bold" {...props} />;
+		case ChannelTypes.GUILD_WHITEBOARD:
+			return <PencilSimpleIcon weight="bold" {...props} />;
 		default:
 			return <HashIcon weight="bold" {...props} />;
 	}
@@ -70,6 +73,9 @@ export function getName(channel: ChannelRecord) {
 			break;
 		case ChannelTypes.GUILD_LINK:
 			baseName = i18n._(msg`Link`);
+			break;
+		case ChannelTypes.GUILD_WHITEBOARD:
+			baseName = i18n._(msg`Whiteboard`);
 			break;
 		default:
 			baseName = i18n._(msg`Text`);

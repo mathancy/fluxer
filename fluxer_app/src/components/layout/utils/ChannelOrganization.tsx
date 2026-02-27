@@ -26,12 +26,15 @@ export const isTextChannel = (ch: ChannelRecord) =>
 
 const isVoiceChannel = (ch: ChannelRecord) => ch.type === ChannelTypes.GUILD_VOICE;
 
+export const isWhiteboardChannel = (ch: ChannelRecord) => ch.type === ChannelTypes.GUILD_WHITEBOARD;
+
 export const isCategory = (ch: ChannelRecord) => ch.type === ChannelTypes.GUILD_CATEGORY;
 
 interface ChannelGroup {
 	category?: ChannelRecord;
 	textChannels: Array<ChannelRecord>;
 	voiceChannels: Array<ChannelRecord>;
+	whiteboardChannels: Array<ChannelRecord>;
 }
 
 export const organizeChannels = (channels: ReadonlyArray<ChannelRecord>): Array<ChannelGroup> => {
@@ -49,6 +52,7 @@ export const organizeChannels = (channels: ReadonlyArray<ChannelRecord>): Array<
 	groups.push({
 		textChannels: nullChannels.filter(isTextChannel).sort(ChannelUtils.compareChannels),
 		voiceChannels: nullChannels.filter(isVoiceChannel).sort(ChannelUtils.compareChannels),
+		whiteboardChannels: nullChannels.filter(isWhiteboardChannel).sort(ChannelUtils.compareChannels),
 	});
 
 	for (const category of categories) {
@@ -57,6 +61,7 @@ export const organizeChannels = (channels: ReadonlyArray<ChannelRecord>): Array<
 			category,
 			textChannels: categoryChannels.filter(isTextChannel).sort(ChannelUtils.compareChannels),
 			voiceChannels: categoryChannels.filter(isVoiceChannel).sort(ChannelUtils.compareChannels),
+			whiteboardChannels: categoryChannels.filter(isWhiteboardChannel).sort(ChannelUtils.compareChannels),
 		});
 	}
 

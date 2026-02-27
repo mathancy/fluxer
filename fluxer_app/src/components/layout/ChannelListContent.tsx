@@ -291,11 +291,16 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 							const selectedVoiceChannels = group.voiceChannels.filter((ch) =>
 								location.pathname.startsWith(`/channels/${guild.id}/${ch.id}`),
 							);
+							const selectedWhiteboardChannels = group.whiteboardChannels.filter((ch) =>
+								location.pathname.startsWith(`/channels/${guild.id}/${ch.id}`),
+							);
 							const unreadTextChannels = group.textChannels.filter((ch) => hasVisibleUnreadInChannel(ch.id));
 							const unreadVoiceChannels = group.voiceChannels.filter((ch) => hasVisibleUnreadInChannel(ch.id));
+							const unreadWhiteboardChannels = group.whiteboardChannels.filter((ch) => hasVisibleUnreadInChannel(ch.id));
 
 							const selectedTextIds = new Set(selectedTextChannels.map((ch) => ch.id));
 							const selectedVoiceIds = new Set(selectedVoiceChannels.map((ch) => ch.id));
+							const selectedWhiteboardIds = new Set(selectedWhiteboardChannels.map((ch) => ch.id));
 
 							const filteredTextChannels = hideMutedChannels
 								? group.textChannels.filter(
@@ -313,11 +318,24 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 									)
 								: group.voiceChannels;
 
+							const filteredWhiteboardChannels = hideMutedChannels
+								? group.whiteboardChannels.filter(
+										(ch) =>
+											selectedWhiteboardIds.has(ch.id) || !UserGuildSettingsStore.isGuildOrChannelMuted(guild.id, ch.id),
+									)
+								: group.whiteboardChannels;
+
 							const visibleTextChannels = isCollapsed
 								? hideMutedChannels
 									? mergeUniqueById(filteredTextChannels.filter((ch) => selectedTextIds.has(ch.id)))
 									: mergeUniqueById([...selectedTextChannels, ...unreadTextChannels])
 								: filteredTextChannels;
+
+							const visibleWhiteboardChannels = isCollapsed
+								? hideMutedChannels
+									? mergeUniqueById(filteredWhiteboardChannels.filter((ch) => selectedWhiteboardIds.has(ch.id)))
+									: mergeUniqueById([...selectedWhiteboardChannels, ...unreadWhiteboardChannels])
+								: filteredWhiteboardChannels;
 
 							let visibleVoiceChannels: typeof filteredVoiceChannels = filteredVoiceChannels;
 							if (isCollapsed) {
@@ -338,7 +356,7 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 								}
 							}
 
-							if (isNullSpace && filteredTextChannels.length === 0 && filteredVoiceChannels.length === 0) {
+							if (isNullSpace && filteredTextChannels.length === 0 && filteredVoiceChannels.length === 0 && filteredWhiteboardChannels.length === 0) {
 								return null;
 							}
 
@@ -346,7 +364,8 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 								hideMutedChannels &&
 								group.category &&
 								filteredTextChannels.length === 0 &&
-								filteredVoiceChannels.length === 0
+								filteredVoiceChannels.length === 0 &&
+								filteredWhiteboardChannels.length === 0
 							) {
 								return null;
 							}
@@ -371,6 +390,7 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 
 							const showTextChannels = !isCollapsed || visibleTextChannels.length > 0;
 							const showVoiceChannels = !isCollapsed || visibleVoiceChannels.length > 0;
+							const showWhiteboardChannels = !isCollapsed || visibleWhiteboardChannels.length > 0;
 
 							return (
 								<div key={group.category?.id || 'null-space'} className={styles.channelGroup}>
@@ -434,6 +454,19 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 												</React.Fragment>
 											);
 										})}
+
+									{showWhiteboardChannels &&
+										visibleWhiteboardChannels.map((ch) => (
+											<ChannelItem
+												key={ch.id}
+												guild={guild}
+												channel={ch}
+												isDraggingAnything={isDraggingAnything}
+												activeDragItem={activeDragItem}
+												onChannelDrop={handleChannelDrop}
+												onDragStateChange={setActiveDragItem}
+											/>
+										))}
 								</div>
 							);
 						})}

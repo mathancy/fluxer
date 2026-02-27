@@ -43,7 +43,10 @@ export const ChannelContextMenu: React.FC<ChannelContextMenuProps> = observer(({
 	});
 
 	const excludeLabels = useMemo(() => [t`Mute Channel`, t`Unmute Channel`], [t]);
-	const showMuteMenuItem = channel.type === ChannelTypes.GUILD_TEXT || channel.type === ChannelTypes.GUILD_VOICE;
+	const showMuteMenuItem =
+		channel.type === ChannelTypes.GUILD_TEXT ||
+		channel.type === ChannelTypes.GUILD_VOICE ||
+		channel.type === ChannelTypes.GUILD_WHITEBOARD;
 
 	return (
 		<>
