@@ -20,12 +20,13 @@
 import * as ChannelActionCreators from '@app/actions/ChannelActionCreators';
 import * as ModalActionCreators from '@app/actions/ModalActionCreators';
 import {selectChannel} from '@app/actions/NavigationActionCreators';
-import {ChannelTypes} from '@fluxer/constants/src/ChannelConstants';
+import {ChannelFlags, ChannelTypes} from '@fluxer/constants/src/ChannelConstants';
 
 export interface FormInputs {
 	name: string;
 	url: string | null;
 	type: string;
+	dark_mode: boolean;
 }
 
 export interface ChannelTypeOption {
@@ -50,10 +51,16 @@ export const channelTypeOptions: Array<ChannelTypeOption> = [
 		name: 'Link Channel',
 		desc: 'Quick access to an external website or resource',
 	},
+	{
+		value: ChannelTypes.GUILD_WHITEBOARD,
+		name: 'Whiteboard Channel',
+		desc: 'Collaborative drawing and diagramming with Excalidraw',
+	},
 ];
 
 export async function createChannel(guildId: string, data: FormInputs, parentId?: string): Promise<void> {
 	const channelType = Number(data.type);
+	const flags = channelType === ChannelTypes.GUILD_WHITEBOARD && data.dark_mode ? ChannelFlags.DARK_MODE_DEFAULT : 0;
 	const channel = await ChannelActionCreators.create(guildId, {
 		name: data.name,
 		url: data.url,
@@ -61,9 +68,10 @@ export async function createChannel(guildId: string, data: FormInputs, parentId?
 		parent_id: parentId || null,
 		bitrate: channelType === ChannelTypes.GUILD_VOICE ? 64000 : null,
 		user_limit: channelType === ChannelTypes.GUILD_VOICE ? 0 : null,
+		...(flags ? {flags} : {}),
 	});
 
-	if (channel.type === ChannelTypes.GUILD_TEXT || channel.type === ChannelTypes.GUILD_VOICE) {
+	if (channel.type === ChannelTypes.GUILD_TEXT || channel.type === ChannelTypes.GUILD_VOICE || channel.type === ChannelTypes.GUILD_WHITEBOARD) {
 		setTimeout(() => {
 			selectChannel(guildId, channel.id);
 		}, 50);
@@ -75,5 +83,6 @@ export async function createChannel(guildId: string, data: FormInputs, parentId?
 export function getDefaultValues(): Partial<FormInputs> {
 	return {
 		type: ChannelTypes.GUILD_TEXT.toString(),
+		dark_mode: false,
 	};
 }

@@ -141,11 +141,20 @@ export const ChannelCreateLinkRequest = ChannelCreateCommon.extend({
 
 export type ChannelCreateLinkRequest = z.infer<typeof ChannelCreateLinkRequest>;
 
+export const ChannelCreateWhiteboardRequest = ChannelCreateCommon.extend({
+	type: createNamedLiteral(ChannelTypes.GUILD_WHITEBOARD, 'GUILD_WHITEBOARD', 'Channel type (whiteboard channel)'),
+	name: GeneralChannelNameType.describe('The name of the channel'),
+	flags: z.number().int().min(0).optional().describe('Channel flags bitfield'),
+});
+
+export type ChannelCreateWhiteboardRequest = z.infer<typeof ChannelCreateWhiteboardRequest>;
+
 export const ChannelCreateRequest = z.discriminatedUnion('type', [
 	ChannelCreateTextRequest,
 	ChannelCreateVoiceRequest,
 	ChannelCreateCategoryRequest,
 	ChannelCreateLinkRequest,
+	ChannelCreateWhiteboardRequest,
 ]);
 
 export type ChannelCreateRequest = z.infer<typeof ChannelCreateRequest>;
@@ -178,6 +187,14 @@ export const ChannelUpdateLinkRequest = ChannelUpdateCommon.extend({
 
 export type ChannelUpdateLinkRequest = z.infer<typeof ChannelUpdateLinkRequest>;
 
+export const ChannelUpdateWhiteboardRequest = ChannelUpdateCommon.extend({
+	type: createNamedLiteral(ChannelTypes.GUILD_WHITEBOARD, 'GUILD_WHITEBOARD', 'Channel type (whiteboard channel)'),
+	name: GeneralChannelNameType.nullish().describe('The name of the channel'),
+	flags: z.number().int().min(0).nullish().describe('Channel flags bitfield'),
+});
+
+export type ChannelUpdateWhiteboardRequest = z.infer<typeof ChannelUpdateWhiteboardRequest>;
+
 export const ChannelUpdateGroupDmRequest = z.object({
 	type: createNamedLiteral(ChannelTypes.GROUP_DM, 'GROUP_DM', 'Channel type (group DM)'),
 	name: GeneralChannelNameType.nullish().describe('The name of the group DM'),
@@ -195,6 +212,7 @@ export const ChannelUpdateRequest = z.discriminatedUnion('type', [
 	ChannelUpdateVoiceRequest,
 	ChannelUpdateCategoryRequest,
 	ChannelUpdateLinkRequest,
+	ChannelUpdateWhiteboardRequest,
 	ChannelUpdateGroupDmRequest,
 ]);
 

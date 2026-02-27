@@ -228,6 +228,10 @@ export class ChannelDataService {
 			channelUpdateData.nicks = guildChannelData.nicks ?? null;
 		}
 
+		if ('flags' in guildChannelData && guildChannelData.flags !== undefined) {
+			channelUpdateData.flags = guildChannelData.flags ?? undefined;
+		}
+
 		return this.channelOperationsService.editChannel({userId, channelId, data: channelUpdateData, requestCache});
 	}
 

@@ -83,6 +83,7 @@ export const ChannelResponse = z.object({
 		.record(z.string(), createStringType(1, 32))
 		.optional()
 		.describe('Custom nicknames for users in this channel (for group DMs)'),
+	flags: Int32Type.optional().describe('Channel flags bitfield'),
 });
 
 export type ChannelResponse = z.infer<typeof ChannelResponse>;

@@ -48,7 +48,7 @@ import PermissionStore from '@app/stores/PermissionStore';
 import type {FlatEmoji} from '@app/types/EmojiTypes';
 import * as EmojiUtils from '@app/utils/EmojiUtils';
 import {applyMarkdownSegments} from '@app/utils/MarkdownToSegmentUtils';
-import {ChannelTypes, Permissions} from '@fluxer/constants/src/ChannelConstants';
+import {ChannelFlags, ChannelTypes, Permissions} from '@fluxer/constants/src/ChannelConstants';
 import {GuildNSFWLevel} from '@fluxer/constants/src/GuildConstants';
 import {Trans, useLingui} from '@lingui/react/macro';
 import {SmileyIcon} from '@phosphor-icons/react';
@@ -73,6 +73,7 @@ interface FormInputs {
 	bitrate?: number;
 	user_limit?: number;
 	rtc_region: string | null;
+	dark_mode?: boolean;
 }
 
 const CHANNEL_OVERVIEW_TAB_ID = 'overview';
@@ -200,6 +201,7 @@ const ChannelOverviewTab: React.FC<{channelId: string}> = observer(({channelId})
 			bitrate: 64,
 			user_limit: 0,
 			rtc_region: null,
+			dark_mode: false,
 		},
 	});
 
@@ -243,6 +245,7 @@ const ChannelOverviewTab: React.FC<{channelId: string}> = observer(({channelId})
 			bitrate: channel.bitrate ? getNearestBitrate(Math.round(channel.bitrate / 1000)) : 64,
 			user_limit: channel.userLimit ?? 0,
 			rtc_region: channel.rtcRegion ?? null,
+			dark_mode: channel.hasFlag(ChannelFlags.DARK_MODE_DEFAULT),
 		});
 	}, [channel, form]);
 
@@ -389,6 +392,11 @@ const ChannelOverviewTab: React.FC<{channelId: string}> = observer(({channelId})
 				updateData.rtc_region = data.rtc_region ?? null;
 			} else if (channel.type === ChannelTypes.GUILD_LINK) {
 				updateData.url = data.url;
+			} else if (channel.type === ChannelTypes.GUILD_WHITEBOARD) {
+				const newFlags = data.dark_mode
+					? (channel.flags | ChannelFlags.DARK_MODE_DEFAULT)
+					: (channel.flags & ~ChannelFlags.DARK_MODE_DEFAULT);
+				updateData.flags = newFlags;
 			}
 
 			await ChannelActionCreators.update(channel.id, updateData);
@@ -403,6 +411,7 @@ const ChannelOverviewTab: React.FC<{channelId: string}> = observer(({channelId})
 				bitrate: data.bitrate ?? currentValues.bitrate ?? 64,
 				user_limit: data.user_limit ?? currentValues.user_limit ?? 0,
 				rtc_region: data.rtc_region ?? currentValues.rtc_region ?? null,
+				dark_mode: data.dark_mode ?? false,
 			});
 			syncTopicFromMarkdown(data.topic ?? '');
 
@@ -428,6 +437,7 @@ const ChannelOverviewTab: React.FC<{channelId: string}> = observer(({channelId})
 			bitrate: channel.bitrate ? getNearestBitrate(Math.round(channel.bitrate / 1000)) : 64,
 			user_limit: channel.userLimit ?? 0,
 			rtc_region: channel.rtcRegion ?? null,
+			dark_mode: channel.hasFlag(ChannelFlags.DARK_MODE_DEFAULT),
 		});
 		syncTopicFromMarkdown(channel.topic ?? '');
 		setTopicExpressionPickerOpen(false);
@@ -460,6 +470,7 @@ const ChannelOverviewTab: React.FC<{channelId: string}> = observer(({channelId})
 	const isGuildVoiceChannel = channel.type === ChannelTypes.GUILD_VOICE;
 	const isCategory = channel.type === ChannelTypes.GUILD_CATEGORY;
 	const isLinkChannel = channel.type === ChannelTypes.GUILD_LINK;
+	const isWhiteboardChannel = channel.type === ChannelTypes.GUILD_WHITEBOARD;
 
 	return (
 		<div className={styles.sectionWrapper}>
@@ -756,6 +767,15 @@ const ChannelOverviewTab: React.FC<{channelId: string}> = observer(({channelId})
 							/>
 						)}
 					</>
+				)}
+
+				{isWhiteboardChannel && (
+					<Switch
+						label={t`Dark Mode`}
+						description={t`Less flashbang. More comfort.`}
+						value={form.watch('dark_mode') ?? false}
+						onChange={(value) => form.setValue('dark_mode', value, {shouldDirty: true})}
+					/>
 				)}
 			</Form>
 		</div>

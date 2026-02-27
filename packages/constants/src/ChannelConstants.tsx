@@ -25,6 +25,7 @@ export const ChannelTypes = {
 	GUILD_VOICE: 2,
 	GROUP_DM: 3,
 	GUILD_CATEGORY: 4,
+	GUILD_WHITEBOARD: 10,
 	GUILD_LINK: 998,
 	DM_PERSONAL_NOTES: 999,
 } as const;
@@ -162,6 +163,14 @@ export const EmbedMediaFlags = {
 export const EmbedMediaFlagsDescriptions: Record<keyof typeof EmbedMediaFlags, string> = {
 	CONTAINS_EXPLICIT_MEDIA: 'Embed media contains explicit content',
 	IS_ANIMATED: 'Embed media is animated',
+};
+
+export const ChannelFlags = {
+	DARK_MODE_DEFAULT: 1 << 0,
+} as const;
+
+export const ChannelFlagsDescriptions: Record<keyof typeof ChannelFlags, string> = {
+	DARK_MODE_DEFAULT: 'Whiteboard channel defaults to dark mode theme',
 };
 
 export const MessageEmbedTypes = {
