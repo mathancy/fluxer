@@ -212,4 +212,37 @@ describe('ChannelMoveOperation', () => {
 
 		expect(operation).toBeNull();
 	});
+
+	it('reorders whiteboard channels within the same category', () => {
+		const category = createChannel({id: 'category', type: ChannelTypes.GUILD_CATEGORY, position: 0});
+		const whiteboardOne = createChannel({
+			id: 'whiteboard-one',
+			type: ChannelTypes.GUILD_WHITEBOARD,
+			position: 1,
+			parentId: category.id,
+		});
+		const whiteboardTwo = createChannel({
+			id: 'whiteboard-two',
+			type: ChannelTypes.GUILD_WHITEBOARD,
+			position: 2,
+			parentId: category.id,
+		});
+
+		const operation = createChannelMoveOperation({
+			channels: [category, whiteboardOne, whiteboardTwo],
+			dragItem: createDragItem(whiteboardTwo),
+			dropResult: {
+				targetId: whiteboardOne.id,
+				position: 'before',
+				targetParentId: category.id,
+			},
+		});
+
+		expect(operation).toEqual({
+			channelId: whiteboardTwo.id,
+			newParentId: category.id,
+			precedingSiblingId: null,
+			position: 0,
+		});
+	});
 });

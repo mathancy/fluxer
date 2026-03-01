@@ -56,6 +56,7 @@ import CalendarStore from '@app/stores/CalendarStore';
 import UserGuildSettingsStore from '@app/stores/UserGuildSettingsStore';
 import MediaEngineStore from '@app/stores/voice/MediaEngineFacade';
 import {getApiErrorCode} from '@app/utils/ApiErrorUtils';
+import * as ChannelUtils from '@app/utils/ChannelUtils';
 import * as RouterUtils from '@app/utils/RouterUtils';
 import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
 import {ChannelTypes, Permissions} from '@fluxer/constants/src/ChannelConstants';
@@ -359,6 +360,12 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 									: mergeUniqueById([...selectedCalendarChannels, ...unreadCalendarChannels])
 								: filteredCalendarChannels;
 
+							const visibleNonVoiceChannels = [
+								...visibleTextChannels,
+								...visibleWhiteboardChannels,
+								...visibleCalendarChannels,
+							].sort(ChannelUtils.compareChannels);
+
 							let visibleVoiceChannels: typeof filteredVoiceChannels = filteredVoiceChannels;
 							if (isCollapsed) {
 								if (hideMutedChannels) {
@@ -411,10 +418,8 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 								}
 							}
 
-							const showTextChannels = !isCollapsed || visibleTextChannels.length > 0;
+							const showNonVoiceChannels = !isCollapsed || visibleNonVoiceChannels.length > 0;
 							const showVoiceChannels = !isCollapsed || visibleVoiceChannels.length > 0;
-							const showWhiteboardChannels = !isCollapsed || visibleWhiteboardChannels.length > 0;
-							const showCalendarChannels = !isCollapsed || visibleCalendarChannels.length > 0;
 
 							return (
 								<div key={group.category?.id || 'null-space'} className={styles.channelGroup}>
@@ -435,8 +440,8 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 										<CollapsedCategoryVoiceParticipants guild={guild} voiceChannels={filteredVoiceChannels} />
 									)}
 
-									{showTextChannels &&
-										visibleTextChannels.map((ch) => (
+									{showNonVoiceChannels &&
+										visibleNonVoiceChannels.map((ch) => (
 											<ChannelItem
 												key={ch.id}
 												guild={guild}
@@ -478,31 +483,7 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 												</React.Fragment>
 											);
 										})}
-
-									{showWhiteboardChannels &&
-										visibleWhiteboardChannels.map((ch) => (
-											<ChannelItem
-												key={ch.id}
-												guild={guild}
-												channel={ch}
-												isDraggingAnything={isDraggingAnything}
-												activeDragItem={activeDragItem}
-												onChannelDrop={handleChannelDrop}
-												onDragStateChange={setActiveDragItem}
-											/>
-										))}
-								{showCalendarChannels &&
-									visibleCalendarChannels.map((ch) => (
-										<ChannelItem
-											key={ch.id}
-											guild={guild}
-											channel={ch}
-											isDraggingAnything={isDraggingAnything}
-											activeDragItem={activeDragItem}
-											onChannelDrop={handleChannelDrop}
-											onDragStateChange={setActiveDragItem}
-										/>
-									))}								</div>
+								</div>
 							);
 						})}
 					</div>
