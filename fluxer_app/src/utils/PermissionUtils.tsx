@@ -259,6 +259,11 @@ function generateGuildGeneralPermissionSpec(i18n: I18n): PermissionSpec {
 				flag: Permissions.MANAGE_CHANNELS,
 			},
 			{
+				title: i18n._(msg`Manage Calendar`),
+				description: i18n._(msg`Create, edit, and delete calendar events.`),
+				flag: Permissions.MANAGE_CALENDAR,
+			},
+			{
 				title: i18n._(msg`Kick Members`),
 				flag: Permissions.KICK_MEMBERS,
 			},
@@ -439,6 +444,11 @@ export function generateChannelGeneralPermissionSpec(i18n: I18n): PermissionSpec
 				title: i18n._(msg`Manage Channel`),
 				description: i18n._(msg`Rename and edit this channel's settings.`),
 				flag: Permissions.MANAGE_CHANNELS,
+			},
+			{
+				title: i18n._(msg`Manage Calendar`),
+				description: i18n._(msg`Create, edit, and delete calendar events in this channel.`),
+				flag: Permissions.MANAGE_CALENDAR,
 			},
 			{
 				title: i18n._(msg`Manage Permissions`),

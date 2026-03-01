@@ -56,6 +56,11 @@ export const channelTypeOptions: Array<ChannelTypeOption> = [
 		name: 'Whiteboard Channel',
 		desc: 'Collaborative drawing and diagramming with Excalidraw',
 	},
+	{
+		value: ChannelTypes.GUILD_CALENDAR,
+		name: 'Calendar Channel',
+		desc: 'Shared collaborative calendar for your community',
+	},
 ];
 
 export async function createChannel(guildId: string, data: FormInputs, parentId?: string): Promise<void> {
@@ -71,7 +76,7 @@ export async function createChannel(guildId: string, data: FormInputs, parentId?
 		...(flags ? {flags} : {}),
 	});
 
-	if (channel.type === ChannelTypes.GUILD_TEXT || channel.type === ChannelTypes.GUILD_VOICE || channel.type === ChannelTypes.GUILD_WHITEBOARD) {
+	if (channel.type === ChannelTypes.GUILD_TEXT || channel.type === ChannelTypes.GUILD_VOICE || channel.type === ChannelTypes.GUILD_WHITEBOARD || channel.type === ChannelTypes.GUILD_CALENDAR) {
 		setTimeout(() => {
 			selectChannel(guildId, channel.id);
 		}, 50);

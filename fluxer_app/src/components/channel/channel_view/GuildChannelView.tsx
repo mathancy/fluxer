@@ -32,6 +32,7 @@ import {ChannelMembers} from '@app/components/channel/ChannelMembers';
 import {ChannelSearchResults} from '@app/components/channel/ChannelSearchResults';
 import {ChannelTextarea} from '@app/components/channel/ChannelTextarea';
 import {WhiteboardApp} from '@app/apps/whiteboard/WhiteboardApp';
+import {CalendarApp} from '@app/apps/calendar/CalendarApp';
 import {ChannelViewScaffold} from '@app/components/channel/channel_view/ChannelViewScaffold';
 import {useChannelSearchState} from '@app/components/channel/channel_view/useChannelSearchState';
 import {Messages} from '@app/components/channel/Messages';
@@ -48,12 +49,13 @@ import DeveloperOptionsStore from '@app/stores/DeveloperOptionsStore';
 import GuildNSFWAgreeStore, {NSFWGateReason} from '@app/stores/GuildNSFWAgreeStore';
 import GuildStore from '@app/stores/GuildStore';
 import GuildVerificationStore from '@app/stores/GuildVerificationStore';
+import MemberListStore from '@app/stores/MemberListStore';
 import MobileLayoutStore from '@app/stores/MobileLayoutStore';
 import MediaEngineStore from '@app/stores/voice/MediaEngineFacade';
 import {ChannelTypes} from '@fluxer/constants/src/ChannelConstants';
 import {GuildNSFWLevel} from '@fluxer/constants/src/GuildConstants';
 import {observer} from 'mobx-react-lite';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 interface GuildChannelViewProps {
 	channelId: string;
@@ -81,6 +83,7 @@ export const GuildChannelView = observer(({channelId, guildId}: GuildChannelView
 		activeSearchSegments,
 	} = searchState;
 	const [hasMessagesBottomBar, setHasMessagesBottomBar] = useState(false);
+	const lastCalendarChannelIdRef = useRef<string | null>(null);
 
 	useEffect(() => {
 		setHasMessagesBottomBar(false);
@@ -88,6 +91,21 @@ export const GuildChannelView = observer(({channelId, guildId}: GuildChannelView
 
 	useChannelSearchVisibility(channelId, isSearchActive);
 	useChannelMemberListVisibility(channelId, isMemberListVisible && !isMobileLayout);
+
+	useEffect(() => {
+		const isCalendarChannel = channel?.type === ChannelTypes.GUILD_CALENDAR;
+		if (!isCalendarChannel || isMobileLayout) {
+			lastCalendarChannelIdRef.current = null;
+			return;
+		}
+
+		if (lastCalendarChannelIdRef.current !== channelId) {
+			lastCalendarChannelIdRef.current = channelId;
+			if (!isMemberListVisible) {
+				MemberListStore.isMembersOpen = true;
+			}
+		}
+	}, [channel?.type, channelId, isMobileLayout, isMemberListVisible]);
 
 	useEffect(() => {
 		const handleGlobalKeydown = (event: Event) => {
@@ -129,6 +147,20 @@ export const GuildChannelView = observer(({channelId, guildId}: GuildChannelView
 	const isWhiteboardChannel = channel.type === ChannelTypes.GUILD_WHITEBOARD;
 	if (isWhiteboardChannel) {
 		return <WhiteboardApp key={channelId} channelId={channelId} channelName={channel.name ?? undefined} />;
+	}
+
+	const isCalendarChannel = channel.type === ChannelTypes.GUILD_CALENDAR;
+	if (isCalendarChannel) {
+		const shouldRenderCalendarMemberList = isMemberListVisible && !isMobileLayout;
+
+		return (
+			<ChannelViewScaffold
+				header={<ChannelHeader channel={channel} showMembersToggle={true} showPins={false} showSearch={false} />}
+				chatArea={<CalendarApp key={channelId} channelId={channelId} />}
+				sidePanel={shouldRenderCalendarMemberList ? <ChannelMembers channel={channel} guild={guild} /> : null}
+				showMemberListDivider={shouldRenderCalendarMemberList}
+			/>
+		);
 	}
 
 	const isVoiceChannel = channel.type === ChannelTypes.GUILD_VOICE;

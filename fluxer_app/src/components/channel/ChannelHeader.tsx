@@ -103,6 +103,7 @@ interface ChannelHeaderProps {
 	voiceCallHeaderSupplement?: React.ReactNode;
 	showMembersToggle?: boolean;
 	showPins?: boolean;
+	showSearch?: boolean;
 	onSearchSubmit?: (query: string, segments: Array<SearchSegment>) => void;
 	onSearchClose?: () => void;
 	isSearchResultsOpen?: boolean;
@@ -116,6 +117,7 @@ export const ChannelHeader = observer(
 		voiceCallHeaderSupplement = null,
 		showMembersToggle = false,
 		showPins = true,
+		showSearch = true,
 		onSearchSubmit,
 		onSearchClose,
 		isSearchResultsOpen,
@@ -658,7 +660,7 @@ export const ChannelHeader = observer(
 								</>
 							)}
 
-							{isMobile && isGuildChannel && (
+							{isMobile && isGuildChannel && showSearch && (
 								<FocusRing offset={-2}>
 									<button
 										type="button"
@@ -729,7 +731,7 @@ export const ChannelHeader = observer(
 								/>
 							)}
 
-							{!isMobile && channel && !isVoiceChannel && (
+							{!isMobile && channel && !isVoiceChannel && showSearch && (
 								<FocusRing offset={-2} within>
 									<div className={styles.messageSearchFocusWrapper}>
 										<MessageSearchBar

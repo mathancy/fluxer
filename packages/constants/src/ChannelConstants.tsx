@@ -26,6 +26,7 @@ export const ChannelTypes = {
 	GROUP_DM: 3,
 	GUILD_CATEGORY: 4,
 	GUILD_WHITEBOARD: 10,
+	GUILD_CALENDAR: 11,
 	GUILD_LINK: 998,
 	DM_PERSONAL_NOTES: 999,
 } as const;
@@ -233,6 +234,7 @@ export const Permissions = {
 	PIN_MESSAGES: 1n << 51n,
 	BYPASS_SLOWMODE: 1n << 52n,
 	UPDATE_RTC_REGION: 1n << 53n,
+	MANAGE_CALENDAR: 1n << 54n,
 } as const;
 
 export const PermissionsDescriptions: Record<keyof typeof Permissions, string> = {
@@ -272,6 +274,7 @@ export const PermissionsDescriptions: Record<keyof typeof Permissions, string> =
 	PIN_MESSAGES: 'Allows pinning messages',
 	BYPASS_SLOWMODE: 'Allows bypassing slowmode',
 	UPDATE_RTC_REGION: 'Allows updating the voice region',
+	MANAGE_CALENDAR: 'Allows creating, editing, and deleting calendar events',
 };
 
 export const ALL_PERMISSIONS = Object.values(Permissions).reduce((acc, p) => acc | p, 0n);
@@ -303,6 +306,7 @@ export const ElevatedPermissions =
 	Permissions.MANAGE_MESSAGES |
 	Permissions.MANAGE_WEBHOOKS |
 	Permissions.MANAGE_EXPRESSIONS |
-	Permissions.MODERATE_MEMBERS;
+	Permissions.MODERATE_MEMBERS |
+	Permissions.MANAGE_CALENDAR;
 
 export const CHANNEL_REINDEX_AFTER_TIMESTAMP = 1769813072;

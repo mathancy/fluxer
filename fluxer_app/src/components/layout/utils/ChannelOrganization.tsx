@@ -28,6 +28,8 @@ const isVoiceChannel = (ch: ChannelRecord) => ch.type === ChannelTypes.GUILD_VOI
 
 export const isWhiteboardChannel = (ch: ChannelRecord) => ch.type === ChannelTypes.GUILD_WHITEBOARD;
 
+export const isCalendarChannel = (ch: ChannelRecord) => ch.type === ChannelTypes.GUILD_CALENDAR;
+
 export const isCategory = (ch: ChannelRecord) => ch.type === ChannelTypes.GUILD_CATEGORY;
 
 interface ChannelGroup {
@@ -35,6 +37,7 @@ interface ChannelGroup {
 	textChannels: Array<ChannelRecord>;
 	voiceChannels: Array<ChannelRecord>;
 	whiteboardChannels: Array<ChannelRecord>;
+	calendarChannels: Array<ChannelRecord>;
 }
 
 export const organizeChannels = (channels: ReadonlyArray<ChannelRecord>): Array<ChannelGroup> => {
@@ -53,6 +56,7 @@ export const organizeChannels = (channels: ReadonlyArray<ChannelRecord>): Array<
 		textChannels: nullChannels.filter(isTextChannel).sort(ChannelUtils.compareChannels),
 		voiceChannels: nullChannels.filter(isVoiceChannel).sort(ChannelUtils.compareChannels),
 		whiteboardChannels: nullChannels.filter(isWhiteboardChannel).sort(ChannelUtils.compareChannels),
+		calendarChannels: nullChannels.filter(isCalendarChannel).sort(ChannelUtils.compareChannels),
 	});
 
 	for (const category of categories) {
@@ -62,6 +66,7 @@ export const organizeChannels = (channels: ReadonlyArray<ChannelRecord>): Array<
 			textChannels: categoryChannels.filter(isTextChannel).sort(ChannelUtils.compareChannels),
 			voiceChannels: categoryChannels.filter(isVoiceChannel).sort(ChannelUtils.compareChannels),
 			whiteboardChannels: categoryChannels.filter(isWhiteboardChannel).sort(ChannelUtils.compareChannels),
+			calendarChannels: categoryChannels.filter(isCalendarChannel).sort(ChannelUtils.compareChannels),
 		});
 	}
 

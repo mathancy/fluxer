@@ -149,12 +149,20 @@ export const ChannelCreateWhiteboardRequest = ChannelCreateCommon.extend({
 
 export type ChannelCreateWhiteboardRequest = z.infer<typeof ChannelCreateWhiteboardRequest>;
 
+export const ChannelCreateCalendarRequest = ChannelCreateCommon.extend({
+	type: createNamedLiteral(ChannelTypes.GUILD_CALENDAR, 'GUILD_CALENDAR', 'Channel type (calendar channel)'),
+	name: GeneralChannelNameType.describe('The name of the channel'),
+});
+
+export type ChannelCreateCalendarRequest = z.infer<typeof ChannelCreateCalendarRequest>;
+
 export const ChannelCreateRequest = z.discriminatedUnion('type', [
 	ChannelCreateTextRequest,
 	ChannelCreateVoiceRequest,
 	ChannelCreateCategoryRequest,
 	ChannelCreateLinkRequest,
 	ChannelCreateWhiteboardRequest,
+	ChannelCreateCalendarRequest,
 ]);
 
 export type ChannelCreateRequest = z.infer<typeof ChannelCreateRequest>;
@@ -195,6 +203,13 @@ export const ChannelUpdateWhiteboardRequest = ChannelUpdateCommon.extend({
 
 export type ChannelUpdateWhiteboardRequest = z.infer<typeof ChannelUpdateWhiteboardRequest>;
 
+export const ChannelUpdateCalendarRequest = ChannelUpdateCommon.extend({
+	type: createNamedLiteral(ChannelTypes.GUILD_CALENDAR, 'GUILD_CALENDAR', 'Channel type (calendar channel)'),
+	name: GeneralChannelNameType.nullish().describe('The name of the channel'),
+});
+
+export type ChannelUpdateCalendarRequest = z.infer<typeof ChannelUpdateCalendarRequest>;
+
 export const ChannelUpdateGroupDmRequest = z.object({
 	type: createNamedLiteral(ChannelTypes.GROUP_DM, 'GROUP_DM', 'Channel type (group DM)'),
 	name: GeneralChannelNameType.nullish().describe('The name of the group DM'),
@@ -213,6 +228,7 @@ export const ChannelUpdateRequest = z.discriminatedUnion('type', [
 	ChannelUpdateCategoryRequest,
 	ChannelUpdateLinkRequest,
 	ChannelUpdateWhiteboardRequest,
+	ChannelUpdateCalendarRequest,
 	ChannelUpdateGroupDmRequest,
 ]);
 

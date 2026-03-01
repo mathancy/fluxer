@@ -33,6 +33,7 @@ import {mergeRateLimitSections} from '@fluxer/api/src/rate_limit_configs/RateLim
 import {UserRateLimitConfigs} from '@fluxer/api/src/rate_limit_configs/UserRateLimitConfig';
 import {WebhookRateLimitConfigs} from '@fluxer/api/src/rate_limit_configs/WebhookRateLimitConfig';
 import {WhiteboardRateLimitConfigs} from '@fluxer/api/src/rate_limit_configs/WhiteboardRateLimitConfig';
+import {CalendarRateLimitConfigs} from '@fluxer/api/src/rate_limit_configs/CalendarRateLimitConfig';
 
 const rateLimitSections = [
 	AuthRateLimitConfigs,
@@ -49,6 +50,7 @@ const rateLimitSections = [
 	MiscRateLimitConfigs,
 	PackRateLimitConfigs,
 	WhiteboardRateLimitConfigs,
+	CalendarRateLimitConfigs,
 ] satisfies ReadonlyArray<RateLimitSection>;
 
 export const RateLimitConfigs = mergeRateLimitSections(...rateLimitSections);

@@ -48,6 +48,7 @@ import {Routes} from '@app/Routes';
 import type {ChannelRecord} from '@app/records/ChannelRecord';
 import type {GuildRecord} from '@app/records/GuildRecord';
 import AccessibilityStore from '@app/stores/AccessibilityStore';
+import CalendarStore from '@app/stores/CalendarStore';
 import ChannelStore from '@app/stores/ChannelStore';
 import FavoritesStore, {type FavoriteChannel} from '@app/stores/FavoritesStore';
 import GuildStore from '@app/stores/GuildStore';
@@ -202,8 +203,10 @@ const FavoriteChannelItem = observer(
 			);
 		}
 
-		const unreadCount = ReadStateStore.getUnreadCount(channel.id);
-		const mentionCount = ReadStateStore.getMentionCount(channel.id);
+		const calendarNotificationCount =
+			channel.type === ChannelTypes.GUILD_CALENDAR ? CalendarStore.getUnreadNotificationCount(channel.id) : 0;
+		const unreadCount = ReadStateStore.getUnreadCount(channel.id) + calendarNotificationCount;
+		const mentionCount = ReadStateStore.getMentionCount(channel.id) + calendarNotificationCount;
 		const isGroupDM = channel.isGroupDM();
 		const isDM = channel.isDM();
 		const recipientId = isDM ? (channel.recipientIds[0] ?? '') : '';

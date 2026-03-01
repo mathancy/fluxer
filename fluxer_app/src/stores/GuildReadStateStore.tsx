@@ -18,6 +18,7 @@
  */
 
 import ChannelStore from '@app/stores/ChannelStore';
+import CalendarStore from '@app/stores/CalendarStore';
 import GuildStore from '@app/stores/GuildStore';
 import PermissionStore from '@app/stores/PermissionStore';
 import ReadStateStore from '@app/stores/ReadStateStore';
@@ -100,17 +101,29 @@ class GuildReadStateStore {
 	private readonly unreadGuilds = observable.set(new Set<GuildId>());
 	updateCounter = 0;
 	private readStateReactionInstalled = false;
+	private calendarReactionInstalled = false;
 
 	constructor() {
 		makeAutoObservable(this, {}, {autoBind: true});
 
 		this.installReadStateReaction();
+		this.installCalendarReaction();
 		reaction(
 			() => UserGuildSettingsStore.version,
 			() => {
 				this.processUserGuildSettingsUpdates();
 			},
 		);
+	}
+
+	private getChannelMentionCount(channelId: string): number {
+		const readStateMentions = ReadStateStore.getMentionCount(channelId);
+		const channel = ChannelStore.getChannel(channelId);
+		if (channel?.type !== ChannelTypes.GUILD_CALENDAR) {
+			return readStateMentions;
+		}
+
+		return readStateMentions + CalendarStore.getUnreadNotificationCount(channelId);
 	}
 
 	private installReadStateReaction(): void {
@@ -151,6 +164,32 @@ class GuildReadStateStore {
 					} else {
 						this.recomputeChannels(guildId, ids);
 					}
+				}
+			},
+		);
+	}
+
+	private installCalendarReaction(): void {
+		if (this.calendarReactionInstalled) return;
+		if (CalendarStore == null) {
+			setTimeout(() => this.installCalendarReaction(), 0);
+			return;
+		}
+		this.calendarReactionInstalled = true;
+
+		reaction(
+			() =>
+				Object.entries(CalendarStore.unreadNotifiedEventIdsByChannel)
+					.map(([channelId, eventIds]) => `${channelId}:${eventIds.length}`)
+					.sort()
+					.join('|'),
+			() => {
+				for (const channelId of Object.keys(CalendarStore.unreadNotifiedEventIdsByChannel)) {
+					const channel = ChannelStore.getChannel(channelId);
+					if (channel == null || channel.type !== ChannelTypes.GUILD_CALENDAR) {
+						continue;
+					}
+					this.recomputeChannels(channel.guildId ?? null, [channelId as ChannelId]);
 				}
 			},
 		);
@@ -208,7 +247,7 @@ class GuildReadStateStore {
 				continue;
 			}
 
-			const mentionCount = ReadStateStore.getMentionCount(channelId);
+			const mentionCount = this.getChannelMentionCount(channelId);
 			const hasUnread = ReadStateStore.hasUnread(channelId);
 			const canContribute = canContributeToGuildUnread(channel, mentionCount);
 
@@ -234,7 +273,7 @@ class GuildReadStateStore {
 
 		let mentionTotal = 0;
 		for (const channelId of newState.mentionChannels) {
-			mentionTotal += ReadStateStore.getMentionCount(channelId);
+			mentionTotal += this.getChannelMentionCount(channelId);
 		}
 		newState.mentionCount.set(mentionTotal);
 
@@ -252,7 +291,7 @@ class GuildReadStateStore {
 		if (guildId == null) {
 			const privateChannels = ChannelStore.getPrivateChannels();
 			for (const channel of privateChannels) {
-				const mentionCount = ReadStateStore.getMentionCount(channel.id);
+				const mentionCount = this.getChannelMentionCount(channel.id);
 				const canContribute = canContributeToGuildUnread(channel, mentionCount);
 
 				if (mentionCount > 0 && canContribute) {
@@ -281,7 +320,7 @@ class GuildReadStateStore {
 					mutedChannels.has(channel.id as ChannelId) ||
 					(channel.parentId != null && mutedChannels.has(channel.parentId as ChannelId));
 
-				const mentionCount = ReadStateStore.getMentionCount(channel.id);
+				const mentionCount = this.getChannelMentionCount(channel.id);
 				const hasUnread = ReadStateStore.hasUnread(channel.id);
 
 				const hasMention = mentionCount > 0;
@@ -383,7 +422,7 @@ class GuildReadStateStore {
 	}
 
 	getMentionCountForPrivateChannel(channelId: string): number {
-		return ReadStateStore.getMentionCount(channelId);
+		return this.getChannelMentionCount(channelId);
 	}
 
 	getGuildChangeSentinel(guildId: string | null): number {
@@ -396,11 +435,15 @@ class GuildReadStateStore {
 		const channels = ChannelStore.getGuildChannels(guildId);
 
 		for (const channel of channels) {
-			if (channel.type === ChannelTypes.GUILD_VOICE && ReadStateStore.getMentionCount(channel.id) === 0) {
+			const mentionCount = this.getChannelMentionCount(channel.id);
+			if (channel.type === ChannelTypes.GUILD_VOICE && mentionCount === 0) {
 				continue;
 			}
 
-			if (PermissionStore.can(CAN_READ_PERMISSIONS, channel) && ReadStateStore.hasUnreadOrMentions(channel.id)) {
+			if (
+				PermissionStore.can(CAN_READ_PERMISSIONS, channel) &&
+				(ReadStateStore.hasUnreadOrMentions(channel.id) || mentionCount > 0)
+			) {
 				return true;
 			}
 		}

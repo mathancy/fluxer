@@ -98,6 +98,7 @@ import type {SweegoWebhookService} from '@fluxer/api/src/webhook/SweegoWebhookSe
 import type {WebhookRequestService} from '@fluxer/api/src/webhook/WebhookRequestService';
 import type {WebhookService} from '@fluxer/api/src/webhook/WebhookService';
 import type {WhiteboardService} from '@fluxer/api/src/whiteboard/WhiteboardService';
+import type {CalendarService} from '@fluxer/api/src/calendar/CalendarService';
 import type {ICacheService} from '@fluxer/cache/src/ICacheService';
 import type {IEmailService} from '@fluxer/email/src/IEmailService';
 import type {IRateLimitService} from '@fluxer/rate_limit/src/IRateLimitService';
@@ -180,6 +181,7 @@ export interface HonoEnv {
 		tenorService: ITenorService;
 		themeService: ThemeService;
 		whiteboardService: WhiteboardService;
+		calendarService: CalendarService;
 		userCacheService: UserCacheService;
 		userRepository: IUserRepository;
 		userService: UserService;

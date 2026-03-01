@@ -28,6 +28,7 @@ import {FLUXERBOT_ID} from '@fluxer/constants/src/AppConstants';
 import {ChannelTypes} from '@fluxer/constants/src/ChannelConstants';
 import {msg} from '@lingui/core/macro';
 import {
+	CalendarBlankIcon,
 	CaretDownIcon,
 	HashIcon,
 	type IconProps,
@@ -57,6 +58,8 @@ export function getIcon(channel: {type: number; nsfw?: boolean}, props: IconProp
 			return <NotePencilIcon weight="bold" {...props} />;
 		case ChannelTypes.GUILD_WHITEBOARD:
 			return <PencilSimpleIcon weight="bold" {...props} />;
+		case ChannelTypes.GUILD_CALENDAR:
+			return <CalendarBlankIcon weight="bold" {...props} />;
 		default:
 			return <HashIcon weight="bold" {...props} />;
 	}
@@ -76,6 +79,9 @@ export function getName(channel: ChannelRecord) {
 			break;
 		case ChannelTypes.GUILD_WHITEBOARD:
 			baseName = i18n._(msg`Whiteboard`);
+			break;
+		case ChannelTypes.GUILD_CALENDAR:
+			baseName = i18n._(msg`Calendar`);
 			break;
 		default:
 			baseName = i18n._(msg`Text`);

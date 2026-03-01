@@ -46,7 +46,8 @@ export const ChannelContextMenu: React.FC<ChannelContextMenuProps> = observer(({
 	const showMuteMenuItem =
 		channel.type === ChannelTypes.GUILD_TEXT ||
 		channel.type === ChannelTypes.GUILD_VOICE ||
-		channel.type === ChannelTypes.GUILD_WHITEBOARD;
+		channel.type === ChannelTypes.GUILD_WHITEBOARD ||
+		channel.type === ChannelTypes.GUILD_CALENDAR;
 
 	return (
 		<>

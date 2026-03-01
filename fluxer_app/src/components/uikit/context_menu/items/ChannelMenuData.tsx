@@ -113,6 +113,7 @@ export interface ChannelMenuState {
 	isVoiceChannel: boolean;
 	isLinkChannel: boolean;
 	isWhiteboardChannel: boolean;
+	isCalendarChannel: boolean;
 	isOwner: boolean;
 	isMuted: boolean;
 	isFavorited: boolean;
@@ -132,6 +133,7 @@ function getChannelMenuState(channel: ChannelRecord, guild: GuildRecord | undefi
 	const isVoiceChannel = channel.type === ChannelTypes.GUILD_VOICE;
 	const isLinkChannel = channel.type === ChannelTypes.GUILD_LINK;
 	const isWhiteboardChannel = channel.type === ChannelTypes.GUILD_WHITEBOARD;
+	const isCalendarChannel = channel.type === ChannelTypes.GUILD_CALENDAR;
 	const isOwner = isGroupDM && channel.ownerId === currentUserId;
 	const settingsGuildId = guild?.id ?? null;
 	const channelOverride = UserGuildSettingsStore.getChannelOverride(settingsGuildId, channel.id);
@@ -156,6 +158,7 @@ function getChannelMenuState(channel: ChannelRecord, guild: GuildRecord | undefi
 		isVoiceChannel,
 		isLinkChannel,
 		isWhiteboardChannel,
+		isCalendarChannel,
 		isOwner,
 		isMuted,
 		isFavorited,
@@ -435,7 +438,10 @@ export function useChannelMenuData(
 			return menuGroups;
 		}
 
-		if (guild && (state.isTextChannel || state.isVoiceChannel || state.isLinkChannel || state.isWhiteboardChannel)) {
+		if (
+			guild &&
+			(state.isTextChannel || state.isVoiceChannel || state.isLinkChannel || state.isWhiteboardChannel || state.isCalendarChannel)
+		) {
 			if (state.hasUnread) {
 				menuGroups.push({
 					items: [

@@ -31,6 +31,7 @@ import {handleChannelUpdate} from '@app/stores/gateway/handlers/channel/ChannelU
 import {handleChannelUpdateBulk} from '@app/stores/gateway/handlers/channel/ChannelUpdateBulk';
 import {handleWhiteboardUpdate} from '@app/stores/gateway/handlers/channel/WhiteboardUpdate';
 import {handleWhiteboardCursorUpdate} from '@app/stores/gateway/handlers/channel/WhiteboardCursorUpdate';
+import {handleCalendarUpdate} from '@app/stores/gateway/handlers/channel/CalendarUpdate';
 import {handleGuildBan} from '@app/stores/gateway/handlers/guild/GuildBan';
 import {handleGuildCreate} from '@app/stores/gateway/handlers/guild/GuildCreate';
 import {handleGuildDelete} from '@app/stores/gateway/handlers/guild/GuildDelete';
@@ -138,6 +139,7 @@ export function createHandlerRegistry(): GatewayHandlerRegistry {
 	registry.set('CHANNEL_RECIPIENT_REMOVE', handleChannelRecipientRemove as GatewayEventHandler);
 	registry.set('WHITEBOARD_UPDATE', handleWhiteboardUpdate as GatewayEventHandler);
 	registry.set('WHITEBOARD_CURSOR', handleWhiteboardCursorUpdate as GatewayEventHandler);
+	registry.set('CALENDAR_UPDATE', handleCalendarUpdate as GatewayEventHandler);
 
 	registry.set('MESSAGE_CREATE', handleMessageCreate as GatewayEventHandler);
 	registry.set('MESSAGE_UPDATE', handleMessageUpdate as GatewayEventHandler);

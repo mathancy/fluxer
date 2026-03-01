@@ -69,6 +69,7 @@ import MobileLayoutStore from '@app/stores/MobileLayoutStore';
 import PermissionStore from '@app/stores/PermissionStore';
 import ReadStateStore from '@app/stores/ReadStateStore';
 import SelectedChannelStore from '@app/stores/SelectedChannelStore';
+import CalendarStore from '@app/stores/CalendarStore';
 import TrustedDomainStore from '@app/stores/TrustedDomainStore';
 import UserGuildSettingsStore from '@app/stores/UserGuildSettingsStore';
 import UserStore from '@app/stores/UserStore';
@@ -174,7 +175,10 @@ export const ChannelItem = observer(
 		);
 		const location = useLocation();
 		const channelPath = useMemo(() => `/channels/${guild.id}/${channel.id}`, [guild.id, channel.id]);
-		const unreadCount = ReadStateStore.getUnreadCount(channel.id);
+		const baseUnreadCount = ReadStateStore.getUnreadCount(channel.id);
+		const calendarNotificationCount =
+			channel.type === ChannelTypes.GUILD_CALENDAR ? CalendarStore.getUnreadNotificationCount(channel.id) : 0;
+		const unreadCount = baseUnreadCount + calendarNotificationCount;
 		const selectedChannelId = SelectedChannelStore.selectedChannelIds.get(guild.id);
 		const {guildId: connectedVoiceGuildId, channelId: connectedVoiceChannelId} = useConnectedVoiceSession();
 		const canManageChannels = PermissionStore.can(Permissions.MANAGE_CHANNELS, channel);
@@ -232,7 +236,7 @@ export const ChannelItem = observer(
 				(!isOnMembersRoute && selectedChannelId === channel.id),
 			[isVoiceSelected, location.pathname, channelPath, isOnMembersRoute, selectedChannelId, channel.id],
 		);
-		const mentionCount = ReadStateStore.getMentionCount(channel.id);
+		const mentionCount = ReadStateStore.getMentionCount(channel.id) + calendarNotificationCount;
 		const unreadState = getChannelUnreadState({
 			unreadCount,
 			mentionCount,

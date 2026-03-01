@@ -45,6 +45,7 @@ import type {HonoApp} from '@fluxer/api/src/types/HonoEnv';
 import {UserController} from '@fluxer/api/src/user/controllers/UserController';
 import {WebhookController} from '@fluxer/api/src/webhook/WebhookController';
 import {WhiteboardController} from '@fluxer/api/src/whiteboard/WhiteboardController';
+import {CalendarController} from '@fluxer/api/src/calendar/CalendarController';
 
 export function registerControllers(routes: HonoApp, config: APIConfig): void {
 	GatewayController(routes);
@@ -66,6 +67,7 @@ export function registerControllers(routes: HonoApp, config: APIConfig): void {
 	TenorController(routes);
 	ThemeController(routes);
 	WhiteboardController(routes);
+	CalendarController(routes);
 
 	if (config.dev.testModeEnabled || config.nodeEnv === 'development') {
 		TestHarnessController(routes);
