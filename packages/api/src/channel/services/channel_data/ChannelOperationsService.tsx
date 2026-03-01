@@ -75,6 +75,7 @@ export interface ChannelUpdateData {
 	icon?: string | null;
 	owner_id?: bigint | null;
 	nicks?: Record<string, string | null> | null;
+	flags?: number;
 }
 
 export class ChannelOperationsService {
@@ -245,6 +246,10 @@ export class ChannelOperationsService {
 				data.rtc_region !== undefined && channel.type === ChannelTypes.GUILD_VOICE
 					? data.rtc_region
 					: channel.rtcRegion,
+			flags:
+				data.flags !== undefined && channel.type === ChannelTypes.GUILD_WHITEBOARD
+					? data.flags
+					: channel.flags,
 			permission_overwrites: new Map(
 				Array.from(permissionOverwrites.entries()).map(([targetId, overwrite]) => [
 					targetId,

@@ -52,12 +52,13 @@ import DimensionStore from '@app/stores/DimensionStore';
 import MobileLayoutStore from '@app/stores/MobileLayoutStore';
 import PermissionStore from '@app/stores/PermissionStore';
 import ReadStateStore from '@app/stores/ReadStateStore';
+import CalendarStore from '@app/stores/CalendarStore';
 import UserGuildSettingsStore from '@app/stores/UserGuildSettingsStore';
 import MediaEngineStore from '@app/stores/voice/MediaEngineFacade';
 import {getApiErrorCode} from '@app/utils/ApiErrorUtils';
 import * as RouterUtils from '@app/utils/RouterUtils';
 import {APIErrorCodes} from '@fluxer/constants/src/ApiErrorCodes';
-import {Permissions} from '@fluxer/constants/src/ChannelConstants';
+import {ChannelTypes, Permissions} from '@fluxer/constants/src/ChannelConstants';
 import {MAX_CHANNELS_PER_CATEGORY} from '@fluxer/constants/src/LimitConstants';
 import {useLingui} from '@lingui/react/macro';
 import {UsersIcon} from '@phosphor-icons/react';
@@ -216,8 +217,11 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 		[guild],
 	);
 	const hasVisibleUnreadInChannel = (channelId: string): boolean => {
-		const unreadCount = ReadStateStore.getUnreadCount(channelId);
-		const mentionCount = ReadStateStore.getMentionCount(channelId);
+		const channel = ChannelStore.getChannel(channelId);
+		const calendarUnreadCount =
+			channel?.type === ChannelTypes.GUILD_CALENDAR ? CalendarStore.getUnreadNotificationCount(channelId) : 0;
+		const unreadCount = ReadStateStore.getUnreadCount(channelId) + calendarUnreadCount;
+		const mentionCount = ReadStateStore.getMentionCount(channelId) + calendarUnreadCount;
 		const isMuted = UserGuildSettingsStore.isChannelMuted(guild.id, channelId);
 		const unreadState = getChannelUnreadState({
 			unreadCount,
@@ -291,11 +295,21 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 							const selectedVoiceChannels = group.voiceChannels.filter((ch) =>
 								location.pathname.startsWith(`/channels/${guild.id}/${ch.id}`),
 							);
+							const selectedWhiteboardChannels = group.whiteboardChannels.filter((ch) =>
+								location.pathname.startsWith(`/channels/${guild.id}/${ch.id}`),
+							);
+							const selectedCalendarChannels = group.calendarChannels.filter((ch) =>
+								location.pathname.startsWith(`/channels/${guild.id}/${ch.id}`),
+							);
 							const unreadTextChannels = group.textChannels.filter((ch) => hasVisibleUnreadInChannel(ch.id));
 							const unreadVoiceChannels = group.voiceChannels.filter((ch) => hasVisibleUnreadInChannel(ch.id));
+							const unreadWhiteboardChannels = group.whiteboardChannels.filter((ch) => hasVisibleUnreadInChannel(ch.id));
+							const unreadCalendarChannels = group.calendarChannels.filter((ch) => hasVisibleUnreadInChannel(ch.id));
 
 							const selectedTextIds = new Set(selectedTextChannels.map((ch) => ch.id));
 							const selectedVoiceIds = new Set(selectedVoiceChannels.map((ch) => ch.id));
+							const selectedWhiteboardIds = new Set(selectedWhiteboardChannels.map((ch) => ch.id));
+							const selectedCalendarIds = new Set(selectedCalendarChannels.map((ch) => ch.id));
 
 							const filteredTextChannels = hideMutedChannels
 								? group.textChannels.filter(
@@ -313,11 +327,37 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 									)
 								: group.voiceChannels;
 
+							const filteredWhiteboardChannels = hideMutedChannels
+								? group.whiteboardChannels.filter(
+										(ch) =>
+											selectedWhiteboardIds.has(ch.id) || !UserGuildSettingsStore.isGuildOrChannelMuted(guild.id, ch.id),
+									)
+								: group.whiteboardChannels;
+
+							const filteredCalendarChannels = hideMutedChannels
+								? group.calendarChannels.filter(
+										(ch) =>
+											selectedCalendarIds.has(ch.id) || !UserGuildSettingsStore.isGuildOrChannelMuted(guild.id, ch.id),
+									)
+								: group.calendarChannels;
+
 							const visibleTextChannels = isCollapsed
 								? hideMutedChannels
 									? mergeUniqueById(filteredTextChannels.filter((ch) => selectedTextIds.has(ch.id)))
 									: mergeUniqueById([...selectedTextChannels, ...unreadTextChannels])
 								: filteredTextChannels;
+
+							const visibleWhiteboardChannels = isCollapsed
+								? hideMutedChannels
+									? mergeUniqueById(filteredWhiteboardChannels.filter((ch) => selectedWhiteboardIds.has(ch.id)))
+									: mergeUniqueById([...selectedWhiteboardChannels, ...unreadWhiteboardChannels])
+								: filteredWhiteboardChannels;
+
+							const visibleCalendarChannels = isCollapsed
+								? hideMutedChannels
+									? mergeUniqueById(filteredCalendarChannels.filter((ch) => selectedCalendarIds.has(ch.id)))
+									: mergeUniqueById([...selectedCalendarChannels, ...unreadCalendarChannels])
+								: filteredCalendarChannels;
 
 							let visibleVoiceChannels: typeof filteredVoiceChannels = filteredVoiceChannels;
 							if (isCollapsed) {
@@ -338,7 +378,7 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 								}
 							}
 
-							if (isNullSpace && filteredTextChannels.length === 0 && filteredVoiceChannels.length === 0) {
+							if (isNullSpace && filteredTextChannels.length === 0 && filteredVoiceChannels.length === 0 && filteredWhiteboardChannels.length === 0 && filteredCalendarChannels.length === 0) {
 								return null;
 							}
 
@@ -346,7 +386,9 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 								hideMutedChannels &&
 								group.category &&
 								filteredTextChannels.length === 0 &&
-								filteredVoiceChannels.length === 0
+								filteredVoiceChannels.length === 0 &&
+								filteredWhiteboardChannels.length === 0 &&
+								filteredCalendarChannels.length === 0
 							) {
 								return null;
 							}
@@ -371,6 +413,8 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 
 							const showTextChannels = !isCollapsed || visibleTextChannels.length > 0;
 							const showVoiceChannels = !isCollapsed || visibleVoiceChannels.length > 0;
+							const showWhiteboardChannels = !isCollapsed || visibleWhiteboardChannels.length > 0;
+							const showCalendarChannels = !isCollapsed || visibleCalendarChannels.length > 0;
 
 							return (
 								<div key={group.category?.id || 'null-space'} className={styles.channelGroup}>
@@ -434,7 +478,31 @@ export const ChannelListContent = observer(({guild, scrollY}: {guild: GuildRecor
 												</React.Fragment>
 											);
 										})}
-								</div>
+
+									{showWhiteboardChannels &&
+										visibleWhiteboardChannels.map((ch) => (
+											<ChannelItem
+												key={ch.id}
+												guild={guild}
+												channel={ch}
+												isDraggingAnything={isDraggingAnything}
+												activeDragItem={activeDragItem}
+												onChannelDrop={handleChannelDrop}
+												onDragStateChange={setActiveDragItem}
+											/>
+										))}
+								{showCalendarChannels &&
+									visibleCalendarChannels.map((ch) => (
+										<ChannelItem
+											key={ch.id}
+											guild={guild}
+											channel={ch}
+											isDraggingAnything={isDraggingAnything}
+											activeDragItem={activeDragItem}
+											onChannelDrop={handleChannelDrop}
+											onDragStateChange={setActiveDragItem}
+										/>
+									))}								</div>
 							);
 						})}
 					</div>

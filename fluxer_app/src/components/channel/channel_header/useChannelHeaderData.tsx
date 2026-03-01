@@ -100,6 +100,10 @@ export const useChannelHeaderData = (channel?: ChannelRecord): ChannelHeaderData
 			return t`Voice Channel`;
 		}
 
+		if (channel.type === ChannelTypes.GUILD_WHITEBOARD) {
+			return t`Whiteboard Channel`;
+		}
+
 		return null;
 	}, [channel]);
 

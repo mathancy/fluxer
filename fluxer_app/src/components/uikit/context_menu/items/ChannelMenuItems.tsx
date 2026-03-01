@@ -125,7 +125,11 @@ export const CopyChannelLinkMenuItem: React.FC<ChannelMenuItemProps> = observer(
 
 export const MuteChannelMenuItem: React.FC<ChannelMenuItemProps> = observer(({channel, onClose}) => {
 	const {t, i18n} = useLingui();
-	const isChannelMuteable = channel.type === ChannelTypes.GUILD_TEXT || channel.type === ChannelTypes.GUILD_VOICE;
+	const isChannelMuteable =
+		channel.type === ChannelTypes.GUILD_TEXT ||
+		channel.type === ChannelTypes.GUILD_VOICE ||
+		channel.type === ChannelTypes.GUILD_WHITEBOARD ||
+		channel.type === ChannelTypes.GUILD_CALENDAR;
 	if (!isChannelMuteable || !channel.guildId) return null;
 	const guildId = channel.guildId;
 	const channelOverride = UserGuildSettingsStore.getChannelOverride(guildId, channel.id);
@@ -319,7 +323,14 @@ export const DeleteChannelMenuItem: React.FC<ChannelMenuItemProps> = observer(({
 
 	const handleDeleteChannel = useCallback(() => {
 		onClose();
-		const channelType = channel.type === ChannelTypes.GUILD_VOICE ? t`Voice Channel` : t`Text Channel`;
+		const channelType =
+			channel.type === ChannelTypes.GUILD_VOICE
+				? t`Voice Channel`
+				: channel.type === ChannelTypes.GUILD_WHITEBOARD
+					? t`Whiteboard Channel`
+					: channel.type === ChannelTypes.GUILD_CALENDAR
+						? t`Calendar Channel`
+					: t`Text Channel`;
 		const channelName = channel.name ?? 'this channel';
 
 		ModalActionCreators.push(

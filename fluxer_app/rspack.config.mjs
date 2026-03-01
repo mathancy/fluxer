@@ -21,7 +21,7 @@ import {execSync} from 'node:child_process';
 import fs from 'node:fs';
 import path, {dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {CopyRspackPlugin, DefinePlugin, HtmlRspackPlugin, SwcJsMinimizerRspackPlugin} from '@rspack/core';
+import {CopyRspackPlugin, DefinePlugin, HtmlRspackPlugin, ProvidePlugin, SwcJsMinimizerRspackPlugin} from '@rspack/core';
 import {createPoFileRule, getLinguiSwcPluginConfig} from './scripts/build/rspack/lingui.mjs';
 import {staticFilesPlugin} from './scripts/build/rspack/static-files.mjs';
 
@@ -272,6 +272,13 @@ export default () => {
 
 		resolve: {
 			alias: {
+				// roughjs, pica, and image-blob-reduce are deps of @excalidraw/excalidraw but
+				// pnpm's strict hoisting prevents Rspack from resolving them via the normal
+				// node_modules walk when they are imported via bare-specifier dynamic imports
+				// inside Excalidraw's pre-built dist chunks.
+				roughjs: path.resolve(__dirname, 'node_modules/roughjs'),
+				pica: path.resolve(__dirname, 'node_modules/pica'),
+				'image-blob-reduce': path.resolve(__dirname, 'node_modules/image-blob-reduce'),
 				'~': SRC_DIR,
 				'@app': SRC_DIR,
 				'@pkgs': PKGS_DIR,
@@ -440,6 +447,10 @@ export default () => {
 			}),
 
 			staticFilesPlugin({staticCdnEndpoint: CDN_ENDPOINT}),
+
+			new ProvidePlugin({
+				process: ['process/browser'],
+			}),
 
 			new DefinePlugin({
 				'process.env.NODE_ENV': JSON.stringify(mode),

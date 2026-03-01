@@ -163,6 +163,7 @@ export class ChannelOperationsService {
 			last_pin_timestamp: null,
 			permission_overwrites: permissionOverwrites,
 			nicks: null,
+			flags: params.data.type === ChannelTypes.GUILD_WHITEBOARD && 'flags' in params.data ? (params.data.flags ?? 0) : null,
 			soft_deleted: false,
 			indexed_at: null,
 			version: 1,

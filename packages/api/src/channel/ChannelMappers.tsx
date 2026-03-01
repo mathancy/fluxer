@@ -112,6 +112,14 @@ function serializeGuildLinkChannel(channel: Channel): ChannelResponse {
 	};
 }
 
+function serializeGuildWhiteboardChannel(channel: Channel): ChannelResponse {
+	return {
+		...serializeBaseChannelFields(channel),
+		...serializePositionableGuildChannelFields(channel),
+		flags: channel.flags,
+	};
+}
+
 function serializeDMChannel(channel: Channel): ChannelResponse {
 	return {
 		...serializeBaseChannelFields(channel),
@@ -192,6 +200,9 @@ export async function mapChannelToResponse({
 			break;
 		case ChannelTypes.GUILD_LINK:
 			response = serializeGuildLinkChannel(channel);
+			break;
+		case ChannelTypes.GUILD_WHITEBOARD:
+			response = serializeGuildWhiteboardChannel(channel);
 			break;
 		case ChannelTypes.DM:
 			response = serializeDMChannel(channel);

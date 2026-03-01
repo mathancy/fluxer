@@ -25,16 +25,9 @@ export const ChannelTypes = {
 	GUILD_VOICE: 2,
 	GROUP_DM: 3,
 	GUILD_CATEGORY: 4,
-	GUILD_LINK: 998,
-	DM_PERSONAL_NOTES: 999,
+	GUILD_WHITEBOARD: 10,
+	GUILD_CALENDAR: 11,
 } as const;
-
-export const TEXT_BASED_CHANNEL_TYPES = new Set<number>([
-	ChannelTypes.GUILD_TEXT,
-	ChannelTypes.DM,
-	ChannelTypes.DM_PERSONAL_NOTES,
-	ChannelTypes.GROUP_DM,
-]);
 
 export const InviteTypes = {
 	GUILD: 0,
@@ -129,6 +122,7 @@ export const Permissions = {
 	PIN_MESSAGES: 1n << 51n,
 	BYPASS_SLOWMODE: 1n << 52n,
 	UPDATE_RTC_REGION: 1n << 53n,
+	MANAGE_CALENDAR: 1n << 54n,
 } as const;
 
 export const ALL_PERMISSIONS = Object.values(Permissions).reduce((acc, p) => acc | p, 0n);

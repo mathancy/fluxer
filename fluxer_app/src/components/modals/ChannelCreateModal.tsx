@@ -20,6 +20,7 @@
 import * as ModalActionCreators from '@app/actions/ModalActionCreators';
 import {Form} from '@app/components/form/Form';
 import {Input} from '@app/components/form/Input';
+import {Switch} from '@app/components/form/Switch';
 import styles from '@app/components/modals/ChannelCreateModal.module.css';
 import * as Modal from '@app/components/modals/Modal';
 import {Button} from '@app/components/uikit/button/Button';
@@ -92,6 +93,14 @@ export const ChannelCreateModal = observer(({guildId, parentId}: {guildId: strin
 							placeholder={t`https://example.com`}
 							required={true}
 							type="url"
+						/>
+					)}
+					{Number(form.watch('type') || '0') === ChannelTypes.GUILD_WHITEBOARD && (
+						<Switch
+							label={t`Dark Mode`}
+							description={t`Less flashbang. More comfort.`}
+							value={form.watch('dark_mode') ?? false}
+							onChange={(value) => form.setValue('dark_mode', value)}
 						/>
 					)}
 				</Modal.Content>

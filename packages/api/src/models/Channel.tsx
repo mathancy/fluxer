@@ -42,6 +42,7 @@ export class Channel {
 	readonly lastPinTimestamp: Date | null;
 	readonly permissionOverwrites: Map<RoleID | UserID, ChannelPermissionOverwrite>;
 	readonly nicknames: Map<string, string>;
+	readonly flags: number;
 	readonly isSoftDeleted: boolean;
 	readonly indexedAt: Date | null;
 	readonly version: number;
@@ -72,6 +73,7 @@ export class Channel {
 			}
 		}
 		this.nicknames = row.nicks ?? new Map();
+		this.flags = row.flags ?? 0;
 		this.isSoftDeleted = row.soft_deleted;
 		this.indexedAt = row.indexed_at ?? null;
 		this.version = row.version;
@@ -109,6 +111,7 @@ export class Channel {
 			last_pin_timestamp: this.lastPinTimestamp,
 			permission_overwrites: permOverwritesMap,
 			nicks: this.nicknames.size > 0 ? this.nicknames : null,
+			flags: this.flags,
 			soft_deleted: this.isSoftDeleted,
 			indexed_at: this.indexedAt,
 			version: this.version,

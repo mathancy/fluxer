@@ -136,6 +136,8 @@ import {StripeService} from '@fluxer/api/src/stripe/StripeService';
 import {TenorService} from '@fluxer/api/src/tenor/TenorService';
 import {ThemeService} from '@fluxer/api/src/theme/ThemeService';
 import type {HonoEnv} from '@fluxer/api/src/types/HonoEnv';
+import {WhiteboardService} from '@fluxer/api/src/whiteboard/WhiteboardService';
+import {CalendarService} from '@fluxer/api/src/calendar/CalendarService';
 import {EmailChangeRepository} from '@fluxer/api/src/user/repositories/auth/EmailChangeRepository';
 import {PasswordChangeRepository} from '@fluxer/api/src/user/repositories/auth/PasswordChangeRepository';
 import {ScheduledMessageRepository} from '@fluxer/api/src/user/repositories/ScheduledMessageRepository';
@@ -374,6 +376,8 @@ export const ServiceMiddleware = createMiddleware<HonoEnv>(async (ctx, next) => 
 	const themeService = new ThemeService(storageService);
 	const csamEvidenceRetentionService = new CsamEvidenceRetentionService(storageService);
 	const gatewayService = getGatewayService();
+	const whiteboardService = new WhiteboardService(storageService, gatewayService);
+	const calendarService = new CalendarService(storageService, gatewayService);
 	const alertService = getAlertService();
 	const workerService = getWorkerService();
 	const botMfaMirrorService = new BotMfaMirrorService(applicationRepository, userRepository, gatewayService);
@@ -929,6 +933,8 @@ export const ServiceMiddleware = createMiddleware<HonoEnv>(async (ctx, next) => 
 	ctx.set('snowflakeService', snowflakeService);
 	ctx.set('storageService', storageService);
 	ctx.set('themeService', themeService);
+	ctx.set('whiteboardService', whiteboardService);
+	ctx.set('calendarService', calendarService);
 	if (stripeService) {
 		ctx.set('stripeService', stripeService);
 	}

@@ -35,7 +35,10 @@ allowBuilds:
 blockExoticSubdeps: true
 minimumReleaseAge: 1440
 strictDepBuilds: true
-trustPolicy: no-downgrade
+# Relaxed from no-downgrade to allow Excalidraw 0.18.0 (React 19 support).
+# Several packages in its dep tree (mermaid, langium) temporarily lost provenance.
+# Restore to no-downgrade once excalidraw's dep tree has full provenance.
+trustPolicy: audit
 
 catalog:
   '@atproto/api': 0.18.20

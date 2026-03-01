@@ -36,7 +36,7 @@ export interface ChannelRtcRegion {
 
 export async function create(
 	guildId: string,
-	params: Pick<Channel, 'name' | 'url' | 'type' | 'parent_id' | 'bitrate' | 'user_limit'>,
+	params: Pick<Channel, 'name' | 'url' | 'type' | 'parent_id' | 'bitrate' | 'user_limit'> & {flags?: number},
 ) {
 	try {
 		const response = await http.post<Channel>(Endpoints.GUILD_CHANNELS(guildId), params);
@@ -49,7 +49,7 @@ export async function create(
 
 export async function update(
 	channelId: string,
-	params: Partial<Pick<Channel, 'name' | 'topic' | 'url' | 'nsfw' | 'icon' | 'owner_id' | 'rtc_region'>>,
+	params: Partial<Pick<Channel, 'name' | 'topic' | 'url' | 'nsfw' | 'icon' | 'owner_id' | 'rtc_region' | 'flags'>>,
 ) {
 	try {
 		const response = await http.patch<Channel>(Endpoints.CHANNEL(channelId), params);

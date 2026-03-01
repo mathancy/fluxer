@@ -232,7 +232,7 @@ class GuildMemberStore {
 				presences: options?.presences ?? true,
 			};
 
-			if (options?.query) {
+			if (options?.query !== undefined) {
 				requestOptions.query = options.query;
 			}
 

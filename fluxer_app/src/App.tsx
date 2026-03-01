@@ -47,9 +47,9 @@ import {startReadStateCleanup} from '@app/lib/ReadStateCleanup';
 import {Outlet, RouterProvider} from '@app/lib/router/React';
 import {router} from '@app/Router';
 import AccessibilityStore, {HdrDisplayMode} from '@app/stores/AccessibilityStore';
+import GuildReadStateStore from '@app/stores/GuildReadStateStore';
 import ModalStore from '@app/stores/ModalStore';
 import PopoutStore from '@app/stores/PopoutStore';
-import ReadStateStore from '@app/stores/ReadStateStore';
 import RuntimeCrashStore from '@app/stores/RuntimeCrashStore';
 import ThemeStore from '@app/stores/ThemeStore';
 import UserStore from '@app/stores/UserStore';
@@ -146,12 +146,11 @@ export const AppWrapper = observer(({children}: AppWrapperProps) => {
 		};
 
 		const updateBadgeFromReadState = () => {
-			const channelIds = ReadStateStore.getChannelIds();
-			const totalMentions = channelIds.reduce((sum, channelId) => sum + ReadStateStore.getMentionCount(channelId), 0);
+			const totalMentions = GuildReadStateStore.getTotalMentionCount();
 			postBadgeUpdate(totalMentions);
 		};
 
-		const unsubscribe = ReadStateStore.subscribe(() => {
+		const unsubscribe = GuildReadStateStore.subscribe(() => {
 			updateBadgeFromReadState();
 		});
 
