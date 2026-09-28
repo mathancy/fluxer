@@ -228,6 +228,15 @@ export default () => {
 				roughjs: path.resolve(__dirname, 'node_modules/roughjs'),
 				pica: path.resolve(__dirname, 'node_modules/pica'),
 				'image-blob-reduce': path.resolve(__dirname, 'node_modules/image-blob-reduce'),
+				// @excalidraw/excalidraw's package.json only exposes "./index.css" under
+				// "development"/"production" export conditions, which aren't in our
+				// conditionNames list below — alias straight to the built file instead.
+				'@excalidraw/excalidraw/index.css': path.resolve(
+					__dirname,
+					isProduction
+						? 'node_modules/@excalidraw/excalidraw/dist/prod/index.css'
+						: 'node_modules/@excalidraw/excalidraw/dist/dev/index.css',
+				),
 				'~': SRC_DIR,
 				'@app': SRC_DIR,
 				'@fluxer/voice_engine_v2/bridge': path.join(
@@ -445,7 +454,7 @@ export default () => {
 				wasmCratesDir: path.join(ROOT_DIR, 'rust'),
 			}),
 			new ProvidePlugin({
-				process: ['process/browser'],
+				process: ['process/browser.js'],
 			}),
 			new DefinePlugin({
 				__FLUXER_PRECACHE_MANIFEST__: JSON.stringify([]),
