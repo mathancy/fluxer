@@ -204,28 +204,9 @@ jobs:
             "${IMAGE}:${VERSION}-arm64"
           docker buildx imagetools inspect "${IMAGE}:${VERSION}"
 
-      - name: Create token
-        id: create-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
-        with:
-          client-id: ${{ vars.FLUXER_CI_APP_ID }}
-          private-key: ${{ secrets.FLUXER_CI_APP_KEY }}
-          owner: fluxerapp
-          repositories: fluxer
-          permission-contents: write
-      - name: Publish GitHub release
-        env:
-          GH_TOKEN: ${{ steps.create-token.outputs.token }}
-          SOURCE_SHA: ${{ github.sha }}
-          VERSION: ${{ needs.meta.outputs.build_version }}
-          RELEASE_BASELINE_SHA: ${{ vars.RELEASE_BASELINE_SHA }}
-        run: >-
-          tools/ci/run.sh release
-          publish
-          --component fluxer-app-proxy-self-hosted
-          --build-version "${VERSION}"
-          --source-sha "${SOURCE_SHA}"
-          --previous-sha "${RELEASE_BASELINE_SHA}"
+      # Note: skipping "Create token" + "Publish GitHub release" here — see
+      # _build-image.yaml for why (upstream-only release bookkeeping, not needed
+      # for self-hosting your own images).
 
       - name: Advance moving image tags
         env:
