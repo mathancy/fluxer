@@ -55,6 +55,17 @@ resolve a diff.
   both had steps minting a GitHub App token hardcoded to `owner: fluxerapp`, which
   fails instantly on any fork. Removed (see the `ci:` commit for why each was safe
   to drop) — all 12 `build-*` workflows now run via `workflow_dispatch` on a fork.
+- ✅ Fixed a real rspack build bug surfaced once the lockfile issue above was out of
+  the way: `ProvidePlugin({process: ['process/browser']})` needs an explicit
+  extension (`process/browser.js`) or rspack's ESM fully-specified resolution
+  rejects it, and `@excalidraw/excalidraw`'s `package.json` only exposes
+  `./index.css` under `development`/`production` export conditions that aren't in
+  our `conditionNames` list — aliased straight to the built dist CSS file instead.
+  Both fixes are in `fluxer_app/rspack.config.mjs`.
+- ✅ All 12 image-producing `build-*` workflows now succeed on `mathancy/fluxer`,
+  including `build-api` and `build-app-proxy-self-hosted` (the two that were
+  blocked above). `build-app-proxy` (non-self-hosted variant), `build-desktop`,
+  and `build-docs` were never triggered — not needed for a self-hosted web deploy.
 - A full copy of your original fork (unmodified, stale) is still fetchable — see
   "Getting the original fork code back" below. Note: `mathancy/fluxer` was deleted
   and recreated partway through this port (to give it a clean `main` instead of the
