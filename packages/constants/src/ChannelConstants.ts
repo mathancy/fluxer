@@ -8,6 +8,7 @@ export const ChannelTypes = {
 	GUILD_VOICE: 2,
 	GROUP_DM: 3,
 	GUILD_CATEGORY: 4,
+	GUILD_WHITEBOARD: 10,
 	GUILD_LINK: 998,
 	DM_PERSONAL_NOTES: 999,
 } as const;

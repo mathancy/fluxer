@@ -47,6 +47,7 @@ import MediaEngine from '@app/features/voice/engine/MediaEngineFacade';
 import {useCompactCallExpansionState} from '@app/features/voice/hooks/useCompactCallExpansionState';
 import {usePendingVoiceConnection} from '@app/features/voice/hooks/usePendingVoiceConnection';
 import {getGuildVoiceCallExpansionKey} from '@app/features/voice/state/CompactVoiceCallHeight';
+import {WhiteboardApp} from '@app/features/whiteboard/components/WhiteboardApp';
 import {
 	goBackFromMobileVoiceTextChatHistoryEntry,
 	isCurrentMobileVoiceTextChatHistoryEntry,
@@ -317,6 +318,9 @@ export const GuildChannelView = observer(({channelId, guildId}: GuildChannelView
 	useFluxerDocumentTitle(channel ? [channelTitlePart, guildTitlePart] : undefined);
 	if (!(guild && channel)) {
 		return null;
+	}
+	if (channel.type === ChannelTypes.GUILD_WHITEBOARD) {
+		return <WhiteboardApp key={channelId} channelId={channelId} channelName={channel.name ?? undefined} />;
 	}
 	if (showMatureContentGate || forceMockMatureContentGate) {
 		return (

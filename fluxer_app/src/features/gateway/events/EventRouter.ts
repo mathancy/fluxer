@@ -68,6 +68,7 @@ import {handleCallUpdate} from '@app/features/voice/events/CallUpdate';
 import {handleEntranceSoundPlay} from '@app/features/voice/events/EntranceSoundPlay';
 import {handleVoiceServerUpdate} from '@app/features/voice/events/VoiceServerUpdate';
 import {handleVoiceStateUpdate} from '@app/features/voice/events/VoiceStateUpdate';
+import {handleWhiteboardUpdate} from '@app/features/whiteboard/events/WhiteboardUpdate';
 
 export interface GatewayGeoipPayload {
 	country_code?: string;
@@ -157,6 +158,7 @@ export function createHandlerRegistry(): GatewayHandlerRegistry {
 	registry.set('FAVORITE_MEME_CREATE', handleFavoriteMemeCreate as GatewayEventHandler);
 	registry.set('FAVORITE_MEME_UPDATE', handleFavoriteMemeUpdate as GatewayEventHandler);
 	registry.set('FAVORITE_MEME_DELETE', handleFavoriteMemeDelete as GatewayEventHandler);
+	registry.set('WHITEBOARD_UPDATE', handleWhiteboardUpdate as GatewayEventHandler);
 	registry.set('SESSIONS_REPLACE', () => {});
 	return registry;
 }
