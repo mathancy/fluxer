@@ -152,11 +152,17 @@ const ChannelCreateLinkRequest = ChannelCreateCommon.extend({
 	name: GeneralChannelNameType.describe('The name of the channel'),
 });
 
+const ChannelCreateWhiteboardRequest = ChannelCreateCommon.extend({
+	type: createNamedLiteral(ChannelTypes.GUILD_WHITEBOARD, 'GUILD_WHITEBOARD', 'Channel type (whiteboard channel)'),
+	name: GeneralChannelNameType.describe('The name of the channel'),
+});
+
 export const ChannelCreateRequest = z.discriminatedUnion('type', [
 	ChannelCreateTextRequest,
 	ChannelCreateVoiceRequest,
 	ChannelCreateCategoryRequest,
 	ChannelCreateLinkRequest,
+	ChannelCreateWhiteboardRequest,
 ]);
 
 export type ChannelCreateRequest = z.infer<typeof ChannelCreateRequest>;
@@ -181,6 +187,11 @@ const ChannelUpdateLinkRequest = ChannelUpdateCommon.extend({
 	name: GeneralChannelNameType.nullish().describe('The name of the channel'),
 });
 
+const ChannelUpdateWhiteboardRequest = ChannelUpdateCommon.extend({
+	type: createNamedLiteral(ChannelTypes.GUILD_WHITEBOARD, 'GUILD_WHITEBOARD', 'Channel type (whiteboard channel)'),
+	name: GeneralChannelNameType.nullish().describe('The name of the channel'),
+});
+
 const ChannelUpdateGroupDmRequest = z.object({
 	type: createNamedLiteral(ChannelTypes.GROUP_DM, 'GROUP_DM', 'Channel type (group DM)'),
 	name: GeneralChannelNameType.nullish().describe('The name of the group DM'),
@@ -196,6 +207,7 @@ export const ChannelUpdateRequest = z.discriminatedUnion('type', [
 	ChannelUpdateVoiceRequest,
 	ChannelUpdateCategoryRequest,
 	ChannelUpdateLinkRequest,
+	ChannelUpdateWhiteboardRequest,
 	ChannelUpdateGroupDmRequest,
 ]);
 

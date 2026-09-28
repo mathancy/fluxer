@@ -46,6 +46,11 @@ export const channelTypeOptions: Array<ChannelTypeOption> = [
 		name: 'Link Channel',
 		desc: 'Quick access to an external website or resource',
 	},
+	{
+		value: ChannelTypes.GUILD_WHITEBOARD,
+		name: 'Whiteboard Channel',
+		desc: 'Collaborative drawing canvas for your team',
+	},
 ];
 
 export async function createChannel(guildId: string, data: FormInputs, parentId?: string): Promise<void> {

@@ -5,7 +5,11 @@ import {ChannelTypes} from '@fluxer/constants/src/ChannelConstants';
 import {compareChannelOrdering} from '@fluxer/schema/src/domains/channel/GuildChannelOrdering';
 
 export const isTextChannel = (ch: Channel) =>
-	ch.type === ChannelTypes.GUILD_TEXT || ch.type === ChannelTypes.GUILD_LINK;
+	ch.type === ChannelTypes.GUILD_TEXT ||
+	ch.type === ChannelTypes.GUILD_LINK ||
+	// TODO(whiteboard UI-integration port, fork commit 7ec1e9664): give whiteboard
+	// channels their own list bucket + icon instead of reusing the text-channel row.
+	ch.type === ChannelTypes.GUILD_WHITEBOARD;
 const isVoiceChannel = (ch: Channel) => ch.type === ChannelTypes.GUILD_VOICE;
 export const isCategory = (ch: Channel) => ch.type === ChannelTypes.GUILD_CATEGORY;
 
