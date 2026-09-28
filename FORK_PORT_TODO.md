@@ -24,13 +24,25 @@ resolve a diff.
 
 ## Current state
 
-- Branch `refactor` in this repo = upstream `main` (current, as of the port date)
-  **plus 2 of your 10 fork-only commits**, ported and adapted to the new architecture:
+- Branch `main` in this repo = upstream `fluxerapp/fluxer:main` (current, as of the
+  port date) **plus your fork's whiteboard work, ported and adapted to the new
+  architecture**:
   - ✅ `feat(whiteboard): add Excalidraw dependency and rspack aliases`
   - ✅ `feat(whiteboard): add whiteboard API endpoints` (backend: rate limit config,
     `WhiteboardController`, `WhiteboardService`, `WhiteboardSchemas`, wired into
     `ControllerRegistry`, `ServiceMiddleware`, `HonoEnv`, `RateLimitConfig`, and the
     `GatewayDispatchEvent` union got `WHITEBOARD_UPDATE`/`WHITEBOARD_CURSOR` added).
+  - ✅ `feat(whiteboard): add Excalidraw canvas with sync and persistence` — the
+    actual canvas, `useWhiteboardSync`, `useWhiteboardCursors` (cursor hook exists
+    but is inert until item #3 below wires up the gateway event), `WhiteboardStore`,
+    `WhiteboardUpdate` gateway handler, and the `GuildChannelView` render branch —
+    all under a new `fluxer_app/src/features/whiteboard/` feature folder.
+  - ✅ Minimal creation + listing support so a whiteboard channel is actually
+    creatable and clickable today: `ChannelCreateRequest`/`ChannelUpdateRequest`
+    schema variants for `GUILD_WHITEBOARD`, a "Whiteboard Channel" option in the
+    create-channel modal, and `organizeChannels()` lists it alongside text channels
+    for now (see item #2 below for the follow-up: a dedicated list bucket + icon).
+  - ⚠️ Dark mode theming is hardcoded to light for now — see item #4.
 - Remotes: `origin` = your fork (`mathancy/fluxer`), `upstream` = `fluxerapp/fluxer`.
 - `pnpm-lock.yaml` was **not** hand-merged — it was left as upstream `main`'s version.
   **Run `pnpm install` before building** to regenerate it against the two new deps
@@ -38,46 +50,32 @@ resolve a diff.
   `highlight.js`, `react-select`, `react-modal-sheet`, `react-zoom-pan-pinch`) added
   to `fluxer_app/package.json` and `pnpm-workspace.yaml`.
 - A full copy of your original fork (unmodified, stale) is still fetchable — see
-  "Getting the original fork code back" below.
+  "Getting the original fork code back" below. Note: `mathancy/fluxer` was deleted
+  and recreated partway through this port (to give it a clean `main` instead of the
+  old `refactor` branch name), so the original history now lives on the
+  `fork-original` branch of the *current* fork, not a separate old repo.
 
 ## Remaining work, in a sane order
 
-### 1. `feat(whiteboard): add Excalidraw canvas with sync and persistence` (fork commit `58d6b234a`)
-The big one — ~1,127 lines. Original files (all under the dead `stores/` architecture):
-- `fluxer_app/src/apps/whiteboard/WhiteboardApp.tsx` (146 lines) + `.module.css` — the
-  Excalidraw canvas component itself. Should port with only import-path changes.
-- `fluxer_app/src/apps/whiteboard/useWhiteboardSync.tsx` (411 lines) — server
-  save/load, localStorage fallback, debounced autosave, reconcile-based remote
-  updates. Needs to read from/write to the new `whiteboardService`/REST endpoints
-  we already ported, and use whatever the current channel-scoped data-fetch
-  convention is (look at how another per-channel feature, e.g. call state, is
-  hooked up under `fluxer_app/src/features/voice/` for the pattern).
-- `fluxer_app/src/stores/WhiteboardStore.tsx` (114 lines) — **delete**; this pattern
-  is gone. Its job (holding per-channel whiteboard gateway state) should become a
-  new file under `fluxer_app/src/features/<something>/state/` (whiteboard doesn't
-  have a feature folder yet — you'll need to create
-  `fluxer_app/src/features/whiteboard/` or similar, following the shape of e.g.
-  `fluxer_app/src/features/channel/state/Channels.ts`).
-- `fluxer_app/src/stores/gateway/handlers/channel/WhiteboardUpdate.tsx` (26 lines) →
-  becomes a `handleWhiteboardUpdate(data, context)` function exported from
-  `fluxer_app/src/features/<whiteboard-feature>/events/WhiteboardUpdate.ts`
-  (mirror `fluxer_app/src/features/channel/events/ChannelUpdate.ts`), then
-  registered in `fluxer_app/src/features/gateway/events/EventRouter.ts`
-  (`registry.set('WHITEBOARD_UPDATE', handleWhiteboardUpdate as GatewayEventHandler)`).
-- `fluxer_app/src/components/channel/channel_view/GuildChannelView.tsx` — 6-line
-  addition to render `<WhiteboardApp key={channelId} />` for whiteboard-type
-  channels. Current `GuildChannelView.tsx` has moved/changed around it, but the
-  splice point should be easy to find (search for how other channel-type-specific
-  renders — e.g. call view — are gated in that file).
+### ~~1. `feat(whiteboard): add Excalidraw canvas with sync and persistence`~~ — done
+Ported as `fluxer_app/src/features/whiteboard/**`. Plus the minimal creation/listing
+support described above, so this is genuinely testable in a running instance now.
 
 ### 2. `feat(whiteboard): integrate whiteboard channels into UI` (fork commit `7ec1e9664`)
-Smaller (70 lines / 8 files) — channel list rendering, header, context menu, bottom
-sheet, `ChannelUtils` helpers for the whiteboard channel type. All files still exist
-in the new tree (just check current import paths):
-`ChannelDetailsBottomSheet.tsx`, `useChannelHeaderData.tsx`, `ChannelListContent.tsx`,
-`ChannelOrganization.tsx`, `ChannelContextMenu.tsx`, `ChannelMenuData.tsx`,
-`ChannelMenuItems.tsx`, `ChannelUtils.tsx`. Depends on #1 existing first (references
-`WhiteboardApp`/whiteboard channel type helpers).
+What's already covered by the minimal port above: creation (radio option) and basic
+listing (lumped into the text-channel bucket, same precedent as `GUILD_LINK`).
+Still open — the *proper* treatment from the original commit:
+- A dedicated `whiteboardChannels` bucket in `ChannelOrganization.ts` (currently
+  merged into `isTextChannel`) plus a distinct list-item icon, instead of reusing
+  the text-channel row.
+- Channel header support (`useChannelHeaderData.tsx`) — whiteboard channels
+  currently get whatever header a text channel gets.
+- Right-click context menu entries (`ChannelContextMenu.tsx`, `ChannelMenuData.tsx`,
+  `ChannelMenuItems.tsx`) — mute/delete for whiteboard channels.
+- Bottom sheet details (`ChannelDetailsBottomSheet.tsx`) on mobile.
+- `ChannelUtils.tsx` whiteboard helpers the fork added for the above.
+All files still exist in the new tree under `fluxer_app/src/features/app/components/layout/`
+and `fluxer_app/src/features/channel/components/` — check current import paths per file.
 
 ### 3. `feat(whiteboard): add real-time collaborative cursor tracking` (fork commit `03665bcb8`)
 - Backend: add `WHITEBOARD_CURSOR` to `fluxer_gateway/src/guild/guild_dispatch.erl`
@@ -141,19 +139,22 @@ or expect to re-resolve the same file twice.
 
 ## Suggested order
 
-`de266cf44` (quick standalone fix) → `58d6b234a` (canvas, foundational) →
+`de266cf44` (quick standalone fix) → ~~`58d6b234a` (canvas, foundational)~~ done →
 `7ec1e9664` (UI integration, depends on canvas) → `03665bcb8` (cursor tracking) →
 `0d81fe20a` (dark mode) → `039c449e3` (calendar, biggest, do last/separately) →
 skip `7bf5cd1d5` and `47e37e530`.
 
 ## Getting the original fork code back
 
-Your original, unmodified fork history is one `git fetch` away — nothing was lost:
+Your original, unmodified fork history is one `git fetch` away — nothing was lost.
+It lives on the `fork-original` branch of this same fork (pushed there during the
+port, since the repo was deleted and recreated partway through to give it a clean
+`main` instead of the old `refactor` name):
 
 ```sh
-git fetch origin refactor:fork-original
-git log --oneline main..fork-original   # the 10 original commits, unmodified
-git show fork-original:path/to/file.tsx # read any original file at any point
+git fetch origin fork-original
+git log --oneline main..origin/fork-original   # the 10 original commits, unmodified
+git show origin/fork-original:path/to/file.tsx # read any original file at any point
 ```
 
 Use this as the reference/source for the porting work above — every "original
