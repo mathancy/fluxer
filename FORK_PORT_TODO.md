@@ -44,11 +44,17 @@ resolve a diff.
     for now (see item #2 below for the follow-up: a dedicated list bucket + icon).
   - ⚠️ Dark mode theming is hardcoded to light for now — see item #4.
 - Remotes: `origin` = your fork (`mathancy/fluxer`), `upstream` = `fluxerapp/fluxer`.
-- `pnpm-lock.yaml` was **not** hand-merged — it was left as upstream `main`'s version.
-  **Run `pnpm install` before building** to regenerate it against the two new deps
+- ✅ `pnpm-lock.yaml` regenerated (`pnpm install`, pnpm 11.27.0) against the new deps
   (`@excalidraw/excalidraw`, `roughjs`, `pica`, `image-blob-reduce`, `process`,
-  `highlight.js`, `react-select`, `react-modal-sheet`, `react-zoom-pan-pinch`) added
-  to `fluxer_app/package.json` and `pnpm-workspace.yaml`.
+  `highlight.js`, `react-select`, `react-modal-sheet`, `react-zoom-pan-pinch`).
+  This was originally left deferred and broke CI's `pnpm install --frozen-lockfile`
+  step in `build-api` and `build-app-proxy-self-hosted` — fixed now, but if you add
+  more deps while working through the rest of this list, remember to re-run
+  `pnpm install` and commit the lockfile before pushing/building.
+- ✅ Fixed `.github/workflows/_build-image.yaml` and `build-app-proxy-self-hosted.yaml`:
+  both had steps minting a GitHub App token hardcoded to `owner: fluxerapp`, which
+  fails instantly on any fork. Removed (see the `ci:` commit for why each was safe
+  to drop) — all 12 `build-*` workflows now run via `workflow_dispatch` on a fork.
 - A full copy of your original fork (unmodified, stale) is still fetchable — see
   "Getting the original fork code back" below. Note: `mathancy/fluxer` was deleted
   and recreated partway through this port (to give it a clean `main` instead of the
@@ -162,6 +168,8 @@ file" mentioned in this doc lives on `fork-original`.
 
 ## Before building
 
-```sh
-pnpm install   # regenerates pnpm-lock.yaml against the new deps
-```
+`pnpm-lock.yaml` is up to date as of the last commit. If you add or bump a
+dependency while working through the rest of this list, run `pnpm install`
+(pnpm 11.27.0 — corepack picks this up automatically from `packageManager` in
+`package.json`) and commit the updated lockfile before pushing, or CI's
+`pnpm install --frozen-lockfile` step will fail the same way it did before.
